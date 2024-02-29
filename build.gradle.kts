@@ -8,6 +8,8 @@ plugins {
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.3"
 }
 
+val javaVersion = 21
+
 group = "net.forgecraft.services"
 version = "1.0.0"
 
@@ -31,6 +33,12 @@ dependencies {
     // Utils
     implementation("commons-io:commons-io:2.15.1")
     implementation("org.jetbrains:annotations:24.1.0")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(javaVersion)
+    }
 }
 
 // Runs for intelij
