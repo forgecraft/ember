@@ -43,4 +43,4 @@ bin/
 
 config.json
 downloads/
-/
+.idea
