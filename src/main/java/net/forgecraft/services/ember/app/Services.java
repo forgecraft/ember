@@ -1,6 +1,6 @@
 package net.forgecraft.services.ember.app;
 
-import net.forgecraft.services.ember.helpers.ArgsParser;
+import java.nio.file.Path;
 
 /**
  * Basic services class to use as dependency injection
@@ -8,10 +8,8 @@ import net.forgecraft.services.ember.helpers.ArgsParser;
 public class Services {
     private final Config config;
 
-    public Services(String[] args) {
-        var appArgs = ArgsParser.parse(args);
-
-        this.config = new Config(appArgs.getOrThrow("config"));
+    public Services(Path configPath) {
+        this.config = new Config(configPath);
     }
 
     public Config getConfig() {

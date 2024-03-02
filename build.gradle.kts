@@ -49,6 +49,9 @@ dependencies {
     // Utils
     implementation("commons-io:commons-io:2.15.1")
 
+    implementation("info.picocli:picocli:4.7.5")
+    annotationProcessor("info.picocli:picocli-codegen:4.7.5")
+
     compileOnly("org.jetbrains:annotations:24.1.0")
     sourceSets.getByName("database").compileOnlyConfigurationName("org.jetbrains:annotations:24.1.0")
 
@@ -57,9 +60,13 @@ dependencies {
 tasks.withType(JavaCompile::class).configureEach {
     options.encoding = "UTF-8"
     options.release.set(javaVersion)
+}
 
+tasks.named("compileJava", JavaCompile::class).configure {
     source(sourceSets.getByName("generated").allJava)
     source(sourceSets.getByName("database").allJava)
+
+    options.compilerArgs.add("-Aproject=${project.group}/${project.name}")
 }
 
 java {

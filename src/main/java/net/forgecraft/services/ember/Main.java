@@ -7,6 +7,9 @@ import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
+
+import java.nio.file.Path;
 
 public final class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
@@ -18,12 +21,19 @@ public final class Main {
 
     public static void main(String[] args) {
         LOGGER.info("Starting application...");
-        INSTANCE = new Main(args);
+
+        var opts = CommandLine.populateSpec(Main.Cli.class, args);
+        if(opts.helpRequested) {
+            CommandLine.usage(opts, System.out);
+            return;
+        }
+
+        INSTANCE = new Main(opts);
     }
 
     // Real application start
-    public Main(String[] args) {
-        this.services = new Services(args);
+    public Main(Cli opts) {
+        this.services = new Services(opts.configPath);
         this.discordApi = new DiscordApiBuilder()
                 .setToken(services.getConfig().getDiscord().token())
                 // Pulled over from the old bot, not sure if all of these are needed
@@ -44,5 +54,14 @@ public final class Main {
 
     public DiscordApi discordApi() {
         return discordApi;
+    }
+
+    public static class Cli {
+
+        @CommandLine.Option(names = {"-c", "--config"}, required = true, description = "Path to the configuration file")
+        public Path configPath;
+
+        @CommandLine.Option(names = {"-h", "-?", "--help"}, description = "Prints this help message and exits", usageHelp = true)
+        public boolean helpRequested = false;
     }
 }

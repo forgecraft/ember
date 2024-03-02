@@ -9,8 +9,8 @@ import java.nio.file.Path;
 public class Config {
     private DiscordConfig discord;
 
-    public Config(String configPath) {
-        load(Path.of(configPath));
+    public Config(Path configPath) {
+        load(configPath);
     }
 
     // For jackson
@@ -63,7 +63,7 @@ public class Config {
 
     private static Config createDefaultConfig() {
         var config = new Config();
-        config.discord = new DiscordConfig("YOUR_DISCORD", -1, new long[] {});
+        config.discord = new DiscordConfig("YOUR_DISCORD_TOKEN", 0, new long[0]);
 
         return config;
     }
