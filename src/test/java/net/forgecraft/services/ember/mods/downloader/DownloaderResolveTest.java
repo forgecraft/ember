@@ -1,9 +1,9 @@
 package net.forgecraft.services.ember.mods.downloader;
 
-import net.forgecraft.services.ember.app.mods.downloader.CurseForgeDownloader;
+import net.forgecraft.services.ember.app.mods.downloader.curseforge.CurseForgeDownloader;
 import net.forgecraft.services.ember.app.mods.downloader.DownloaderFactory;
-import net.forgecraft.services.ember.app.mods.downloader.MavenDownloader;
-import net.forgecraft.services.ember.app.mods.downloader.ModrinthDownloader;
+import net.forgecraft.services.ember.app.mods.downloader.maven.MavenDownloader;
+import net.forgecraft.services.ember.app.mods.downloader.modrinth.ModrinthDownloader;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

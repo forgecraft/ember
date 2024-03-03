@@ -1,5 +1,6 @@
-package net.forgecraft.services.ember.app.mods.downloader;
+package net.forgecraft.services.ember.app.mods.downloader.modrinth;
 
+import net.forgecraft.services.ember.app.mods.downloader.Downloader;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
