@@ -1,9 +1,8 @@
 package net.forgecraft.services.ember.app.mods.downloader.modrinth;
 
+import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.Downloader;
 import org.jetbrains.annotations.Nullable;
-
-import java.nio.file.Path;
 
 /**
  * A downloader for Modrinth
@@ -20,8 +19,8 @@ public class ModrinthDownloader implements Downloader {
     }
 
     @Override
-    public @Nullable Path download(String inputData) {
-        System.out.println("ModrinthDownloader: " + inputData);
-        return null;
+    public @Nullable DownloadInfo startDownload(String inputData) {
+        // TODO Implement
+        throw new UnsupportedOperationException("Modrinth: " + inputData);
     }
 }

@@ -1,9 +1,8 @@
 package net.forgecraft.services.ember.app.mods.downloader.curseforge;
 
+import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.Downloader;
 import org.jetbrains.annotations.Nullable;
-
-import java.nio.file.Path;
 
 /**
  * A downloader for CurseForge
@@ -20,9 +19,9 @@ public class CurseForgeDownloader implements Downloader {
     }
 
     @Override
-    public @Nullable Path download(String inputData) {
-        System.out.println("CurseForgeDownloader: " + inputData);
-        return null;
+    public @Nullable DownloadInfo startDownload(String inputData) {
+        // TODO Implement
+        throw new UnsupportedOperationException("CurseForge: " + inputData);
     }
 
     /**
@@ -33,6 +32,7 @@ public class CurseForgeDownloader implements Downloader {
      */
     @Nullable
     private String lookup(String inputData) {
-        return null;
+        // TODO Implement
+        throw new UnsupportedOperationException("CurseForge: " + inputData);
     }
 }
