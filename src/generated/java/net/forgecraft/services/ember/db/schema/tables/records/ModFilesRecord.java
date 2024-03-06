@@ -105,17 +105,17 @@ public class ModFilesRecord extends UpdatableRecordImpl<ModFilesRecord> {
     }
 
     /**
-     * Setter for <code>mod_files.file_path</code>.
+     * Setter for <code>mod_files.sha_512</code>.
      */
-    public void setFilePath(String value) {
+    public void setSha_512(byte[] value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>mod_files.file_path</code>.
+     * Getter for <code>mod_files.sha_512</code>.
      */
-    public String getFilePath() {
-        return (String) get(6);
+    public byte[] getSha_512() {
+        return (byte[]) get(6);
     }
 
     /**
@@ -155,7 +155,7 @@ public class ModFilesRecord extends UpdatableRecordImpl<ModFilesRecord> {
     /**
      * Create a detached, initialised ModFilesRecord
      */
-    public ModFilesRecord(Integer id, String modId, Long uploaderId, String modVersion, Boolean active, String fileName, String filePath, LocalDateTime createdAt) {
+    public ModFilesRecord(Integer id, String modId, Long uploaderId, String modVersion, Boolean active, String fileName, byte[] sha_512, LocalDateTime createdAt) {
         super(ModFiles.MOD_FILES);
 
         setId(id);
@@ -164,7 +164,7 @@ public class ModFilesRecord extends UpdatableRecordImpl<ModFilesRecord> {
         setModVersion(modVersion);
         setActive(active);
         setFileName(fileName);
-        setFilePath(filePath);
+        setSha_512(sha_512);
         setCreatedAt(createdAt);
         resetChangedOnNotNull();
     }

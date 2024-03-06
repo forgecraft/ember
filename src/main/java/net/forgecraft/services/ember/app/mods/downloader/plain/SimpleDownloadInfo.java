@@ -17,7 +17,7 @@ public class SimpleDownloadInfo implements DownloadInfo {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDownloadInfo.class);
     private final URI url;
-    private Hash hash = null;
+    private Hash hashSha512 = null;
     private final String fileName;
     private final CompletableFuture<byte[]> download;
 
@@ -39,15 +39,15 @@ public class SimpleDownloadInfo implements DownloadInfo {
                         throw new IllegalStateException("Failed to download " + url + ": Received status code " + response.statusCode());
                     }
                     var bytes = response.body();
-                    var calculatedHash = Hash.fromBytes(Hash.Type.SHA256, bytes);
+                    var calculatedHash = Hash.fromBytes(Hash.Type.SHA512, bytes);
 
                     // verify hash matches if it exists
-                    if (hash != null) {
-                        if (!calculatedHash.equals(hash)) {
-                            throw new IllegalStateException("Hash mismatch for " + url + ": expected " + hash + ", got " + calculatedHash);
+                    if (hashSha512 != null) {
+                        if (!calculatedHash.equals(hashSha512)) {
+                            throw new IllegalStateException("Hash mismatch for " + url + ": expected " + hashSha512 + ", got " + calculatedHash);
                         }
                     } else {
-                        this.hash = calculatedHash;
+                        this.hashSha512 = calculatedHash;
                     }
                     return bytes;
                 });
@@ -63,13 +63,13 @@ public class SimpleDownloadInfo implements DownloadInfo {
     }
 
     @Override
-    public @Nullable Hash getSha256() {
-        return hash;
+    public @Nullable Hash getSha512() {
+        return hashSha512;
     }
 
-    public void setSha256Hash(@Nullable Hash hash) {
-        Preconditions.checkArgument(hash == null || hash.type() == Hash.Type.SHA256, "Hash type must be SHA256");
-        this.hash = hash;
+    public void setSha512(@Nullable Hash hash) {
+        Preconditions.checkArgument(hash == null || hash.type() == Hash.Type.SHA512, "Hash type must be SHA-512");
+        this.hashSha512 = hash;
     }
 
     @Override

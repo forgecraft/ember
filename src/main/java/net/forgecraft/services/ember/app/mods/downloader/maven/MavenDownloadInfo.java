@@ -14,9 +14,9 @@ class MavenDownloadInfo extends SimpleDownloadInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(MavenDownloadInfo.class);
     private final ArtifactInfo artifact;
 
-    public MavenDownloadInfo(String mavenURL, ArtifactInfo artifact, @Nullable Hash sha256, HttpClient client) {
+    public MavenDownloadInfo(String mavenURL, ArtifactInfo artifact, @Nullable Hash sha512, HttpClient client) {
         super(URI.create(mavenURL + "/" + artifact.toUrlPath()), artifact.getFileName(), client);
-        this.setSha256Hash(sha256);
+        this.setSha512(sha512);
         this.artifact = artifact;
     }
 

@@ -10,11 +10,11 @@ public interface DownloadInfo {
     URI getUrl();
 
     /**
-     * Get the sha256 hash of the downloaded file.<br>
+     * Get the SHA-512 hash of the downloaded file.<br>
      * If this method is called before {@link DownloadInfo#isComplete()} returns true, and the hash is not known beforehand, it will return {@code null}.
      */
     @Nullable
-    Hash getSha256();
+    Hash getSha512();
 
     boolean isComplete();
 

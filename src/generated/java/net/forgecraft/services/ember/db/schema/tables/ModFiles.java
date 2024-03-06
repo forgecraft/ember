@@ -91,9 +91,9 @@ public class ModFiles extends TableImpl<ModFilesRecord> {
     public final TableField<ModFilesRecord, String> FILE_NAME = createField(DSL.name("file_name"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
-     * The column <code>mod_files.file_path</code>.
+     * The column <code>mod_files.sha_512</code>.
      */
-    public final TableField<ModFilesRecord, String> FILE_PATH = createField(DSL.name("file_path"), SQLDataType.CLOB.nullable(false), this, "");
+    public final TableField<ModFilesRecord, byte[]> SHA_512 = createField(DSL.name("sha_512"), SQLDataType.BLOB.nullable(false), this, "");
 
     /**
      * The column <code>mod_files.created_at</code>.
@@ -169,7 +169,7 @@ public class ModFiles extends TableImpl<ModFilesRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.asList(Indexes.MOD_FILES_BY_ACTIVE, Indexes.MOD_FILES_BY_MOD_ID, Indexes.MOD_FILES_BY_UPLOADER_ID);
+        return Arrays.asList(Indexes.MOD_FILES_BY_ACTIVE, Indexes.MOD_FILES_BY_MOD_ID, Indexes.MOD_FILES_BY_MODID_AND_SHA512, Indexes.MOD_FILES_BY_UPLOADER_ID);
     }
 
     @Override

@@ -30,11 +30,12 @@ CREATE TABLE IF NOT EXISTS mod_files (
     mod_version TEXT NOT NULL,
     active BOOLEAN DEFAULT TRUE,
     file_name TEXT NOT NULL, -- file name as uploaded
-    file_path TEXT UNIQUE NOT NULL, -- path to the file in the global file storage
+    sha_512 BLOB NOT NULL, -- hash of file contents
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY(mod_id) REFERENCES mods(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY(uploader_id) REFERENCES discord_users(snowflake) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY(uploader_id) REFERENCES discord_users(snowflake) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE(mod_id, sha_512)
 );
 CREATE INDEX IF NOT EXISTS mod_files_by_mod_id ON mod_files (mod_id);
 CREATE INDEX IF NOT EXISTS mod_files_by_uploader_id ON mod_files (uploader_id);

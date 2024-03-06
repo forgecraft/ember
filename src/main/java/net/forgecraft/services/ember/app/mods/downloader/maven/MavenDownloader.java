@@ -81,7 +81,7 @@ public class MavenDownloader implements Downloader {
         }
 
         // It exists! try to download the hash first
-        Hash hash = downloadHashFromUrl(mavenUrl, artifact, Hash.Type.SHA256, client);
+        Hash hash = downloadHashFromUrl(mavenUrl, artifact, Hash.Type.SHA512, client);
         return new MavenDownloadInfo(mavenUrl, artifact, hash, client);
     }
 
@@ -95,7 +95,7 @@ public class MavenDownloader implements Downloader {
                     .build();
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                return Hash.fromString(Hash.Type.SHA256, response.body().lines().collect(Collectors.joining()).strip());
+                return Hash.fromString(hashType, response.body().lines().collect(Collectors.joining()).strip());
             }
         } catch (Exception e) {
             // ignore exception, we'll just download the file without the hash

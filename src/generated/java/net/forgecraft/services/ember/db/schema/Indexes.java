@@ -27,6 +27,7 @@ public class Indexes {
     public static final Index AUDIT_LOG_BY_USER_ID = Internal.createIndex(DSL.name("audit_log_by_user_id"), AuditLog.AUDIT_LOG, new OrderField[] { AuditLog.AUDIT_LOG.USER_ID }, false);
     public static final Index MOD_FILES_BY_ACTIVE = Internal.createIndex(DSL.name("mod_files_by_active"), ModFiles.MOD_FILES, new OrderField[] { ModFiles.MOD_FILES.ACTIVE }, false);
     public static final Index MOD_FILES_BY_MOD_ID = Internal.createIndex(DSL.name("mod_files_by_mod_id"), ModFiles.MOD_FILES, new OrderField[] { ModFiles.MOD_FILES.MOD_ID }, false);
+    public static final Index MOD_FILES_BY_MODID_AND_SHA512 = Internal.createIndex(DSL.name("mod_files_by_modid_and_sha512"), ModFiles.MOD_FILES, new OrderField[] { ModFiles.MOD_FILES.MOD_ID, ModFiles.MOD_FILES.SHA_512 }, true);
     public static final Index MOD_FILES_BY_UPLOADER_ID = Internal.createIndex(DSL.name("mod_files_by_uploader_id"), ModFiles.MOD_FILES, new OrderField[] { ModFiles.MOD_FILES.UPLOADER_ID }, false);
     public static final Index MOD_OWNERS_BY_DISCORD_USER = Internal.createIndex(DSL.name("mod_owners_by_discord_user"), ModOwners.MOD_OWNERS, new OrderField[] { ModOwners.MOD_OWNERS.USER_ID }, false);
     public static final Index MOD_OWNERS_BY_MOD_ID = Internal.createIndex(DSL.name("mod_owners_by_mod_id"), ModOwners.MOD_OWNERS, new OrderField[] { ModOwners.MOD_OWNERS.MOD_ID }, false);
