@@ -19,7 +19,7 @@ public enum DownloaderFactory {
     private final List<Downloader> downloaders = List.of(
             new ModrinthDownloader(),
             new CurseForgeDownloader(),
-            new MavenDownloader(Util::newHttpClient, Util.TRUSTED_MAVENS, false),
+            new MavenDownloader(Util::newHttpClient, Util.KNOWN_MAVENS),
             new PlainUrlDownloader(Util::newHttpClient, false)
     );
 

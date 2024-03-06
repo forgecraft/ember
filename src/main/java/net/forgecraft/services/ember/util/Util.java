@@ -7,10 +7,10 @@ public class Util {
 
     // TODO move to config
     /**
-     * We're basically just acting as a proxy for these mavens so we can download the artifacts
+     * A list of known maven repositories to try and resolve maven artifacts against
      */
     @Deprecated
-    public static final List<String> TRUSTED_MAVENS = List.of(
+    public static final List<String> KNOWN_MAVENS = List.of(
             "https://maven.blamejared.com",
             "https://modmaven.k-4u.nl",
             "https://maven.saps.dev/releases",
@@ -24,6 +24,13 @@ public class Util {
             "https://repo.spongepowered.org/maven"
     );
 
+    //TODO might be wise to use a different http library that allows setting default headers such as User-Agent
+    /**
+     * @implNote Need to use the builder because the default HTTP client does not follow any redirects.
+     * We change this so it does, except for redirects to less secure URLs, i.e. https to http
+     *
+     * @return a new {@link HttpClient} that follows redirects
+     */
     public static HttpClient newHttpClient() {
         return HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.NORMAL)
