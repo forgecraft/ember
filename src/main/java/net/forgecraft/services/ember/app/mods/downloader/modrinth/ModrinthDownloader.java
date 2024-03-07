@@ -105,12 +105,7 @@ public class ModrinthDownloader implements Downloader {
             }
 
             var hash = Optional.ofNullable(primaryFile.hashes().get("sha512"))
-                    .map(raw -> {
-                        if (raw.startsWith("sha512:")) {
-                            raw = raw.substring(7);
-                        }
-                        return Hash.fromString(Hash.Type.SHA512, raw);
-                    })
+                    .map(raw -> Hash.fromString(Hash.Type.SHA512, raw))
                     .orElse(null);
 
             // TODO parse and download required dependencies
