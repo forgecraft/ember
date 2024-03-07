@@ -55,9 +55,6 @@ public class ModUploadListener implements MessageCreateListener {
         // analyze the message and search for download targets
         CompletableFuture.runAsync(() -> {
 
-            // TODO implement other cases
-            // TODO handle multiple cases per message
-
             List<DownloadInfo> downloads = new ArrayList<>();
 
             // simplest case first: are there file attachments?
