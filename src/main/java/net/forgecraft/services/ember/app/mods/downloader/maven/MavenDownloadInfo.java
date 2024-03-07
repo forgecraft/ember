@@ -20,7 +20,7 @@ class MavenDownloadInfo extends SimpleDownloadInfo {
 
     @Override
     protected void printStartMessage() {
-        LOGGER.debug("Downloading {} from {}", artifact.getFileName(), getUrl());
+        LOGGER.debug("Downloading {} from {}", getArtifact().getFileName(), getUrl());
     }
 
     public ArtifactInfo getArtifact() {

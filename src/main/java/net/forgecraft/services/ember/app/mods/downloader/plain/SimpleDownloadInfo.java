@@ -39,7 +39,7 @@ public class SimpleDownloadInfo implements DownloadInfo {
 
     protected CompletableFuture<byte[]> startDownload(HttpClient client) {
         return CompletableFuture.runAsync(this::printStartMessage, Util.BACKGROUND_EXECUTOR)
-                .thenComposeAsync(aVoid -> client.sendAsync(HttpRequest.newBuilder(url).build(), HttpResponse.BodyHandlers.ofByteArray()))
+                .thenComposeAsync(aVoid -> client.sendAsync(createRequestBuilder().build(), HttpResponse.BodyHandlers.ofByteArray()))
                 .thenApply(response -> {
                     if (response.statusCode() != 200) {
                         throw new IllegalStateException("Failed to download " + url + ": Received status code " + response.statusCode());
@@ -61,6 +61,10 @@ public class SimpleDownloadInfo implements DownloadInfo {
 
     protected void printStartMessage() {
         LOGGER.debug("Downloading {}", url);
+    }
+
+    protected HttpRequest.Builder createRequestBuilder() {
+        return HttpRequest.newBuilder(url);
     }
 
     @Override

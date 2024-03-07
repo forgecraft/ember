@@ -21,7 +21,7 @@ public enum DownloaderFactory {
      * If there is no special matches, we'll fall back to the url downloader.
      */
     private final List<Downloader> downloaders = List.of(
-            new ModrinthDownloader(),
+            new ModrinthDownloader(Util.services().getConfig().getModrinth(), Util::newHttpClient),
             new CurseForgeDownloader(),
             new MavenDownloader(Util::newHttpClient, Util.KNOWN_MAVENS),
             new PlainUrlDownloader(Util::newHttpClient, false)

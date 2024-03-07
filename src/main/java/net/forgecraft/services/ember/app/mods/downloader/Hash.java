@@ -44,4 +44,8 @@ public record Hash(Type type, HashCode value) {
     public String toString() {
         return type() + ":" + value().toString();
     }
+
+    public String stringValue() {
+        return value().toString();
+    }
 }

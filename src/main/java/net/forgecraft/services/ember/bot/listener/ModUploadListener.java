@@ -93,7 +93,7 @@ public class ModUploadListener implements MessageCreateListener {
             AtomicBoolean errored = new AtomicBoolean(false);
 
             CompletableFuture.allOf(downloads.stream().map(download -> download.getFileContents().thenAcceptAsync(bytes -> {
-                        var hash = Objects.requireNonNull(download.getSha512()).toString();
+                        var hash = Objects.requireNonNull(download.getSha512()).stringValue();
                         var target = Path.of(".").resolve(hash).resolve(download.getFileName());
                         try {
                             DownloadHelper.saveTo(target, bytes);

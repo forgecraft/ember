@@ -15,7 +15,8 @@ import java.nio.file.Path;
 public final class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    private static Main INSTANCE;
+    @Deprecated
+    public static volatile Main INSTANCE;
 
     private final Services services;
     private final DiscordApi discordApi;

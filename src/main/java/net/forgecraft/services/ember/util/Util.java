@@ -1,5 +1,8 @@
 package net.forgecraft.services.ember.util;
 
+import net.forgecraft.services.ember.Main;
+import net.forgecraft.services.ember.app.Services;
+
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -48,6 +51,10 @@ public class Util {
             return input.substring(0, input.length() - 1);
         }
         return input;
+    }
+
+    public static Services services() {
+        return Main.INSTANCE.services();
     }
 
     public static final ExecutorService BACKGROUND_EXECUTOR = Executors.newCachedThreadPool(r -> new Thread(r, "Ember Background Worker"));
