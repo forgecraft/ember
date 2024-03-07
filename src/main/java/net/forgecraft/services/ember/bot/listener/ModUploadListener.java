@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -73,7 +74,11 @@ public class ModUploadListener implements MessageCreateListener {
             // next: test each line for being a valid download target
             if (!msg.getContent().isEmpty()) {
                 msg.getContent().lines()
+                        // split on whitespace in case there are multiple targets on one line
+                        .flatMap(line -> Arrays.stream(line.split("\\s")))
                         .filter(Predicate.not(String::isBlank))
+                        // surrounding a URL with <> causes it to not embed, so we special-case this to make it still parse as valid URL later
+                        .map(s -> s.replaceAll("^<(.*)>$", "$1"))
                         .map(DownloaderFactory.INSTANCE::tryDownload)
                         .filter(Objects::nonNull)
                         .forEach(downloads::add);
