@@ -2,6 +2,7 @@ package net.forgecraft.services.ember;
 
 
 import net.forgecraft.services.ember.app.Services;
+import net.forgecraft.services.ember.bot.listener.ModUploadListener;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
@@ -36,8 +37,11 @@ public final class Main {
         this.services = new Services(opts.configPath);
         this.discordApi = new DiscordApiBuilder()
                 .setToken(services.getConfig().getDiscord().token())
-                // Pulled over from the old bot, not sure if all of these are needed
-                .addIntents(Intent.GUILDS, Intent.GUILD_MEMBERS, Intent.GUILD_MESSAGES, Intent.GUILD_MESSAGE_REACTIONS, Intent.DIRECT_MESSAGES, Intent.DIRECT_MESSAGE_REACTIONS)
+                .addIntents(
+                        Intent.GUILD_MESSAGES, // general message events
+                        Intent.GUILD_MESSAGE_REACTIONS, // reactions as triggers
+                        Intent.MESSAGE_CONTENT // read message contents for mod uploads
+                )
                 .login()
                 .join();
 
@@ -46,6 +50,8 @@ public final class Main {
                 event.getChannel().sendMessage("Pong!");
             }
         });
+
+        this.discordApi.addMessageCreateListener(new ModUploadListener(services.getConfig().getDiscord()));
     }
 
     public Services services() {

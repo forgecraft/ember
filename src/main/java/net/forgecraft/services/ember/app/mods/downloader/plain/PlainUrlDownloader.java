@@ -35,7 +35,9 @@ public class PlainUrlDownloader implements Downloader {
     public @Nullable DownloadInfo startDownload(String inputData) {
         try {
             var uri = new URI(inputData);
-            return new SimpleDownloadInfo(uri, clientFactory.get());
+            var dl = new SimpleDownloadInfo(uri);
+            dl.start(clientFactory.get());
+            return dl;
         } catch (URISyntaxException e) {
             LOGGER.error("Unable to download " + inputData, e);
         }

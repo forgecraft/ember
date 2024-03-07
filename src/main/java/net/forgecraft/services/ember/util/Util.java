@@ -2,6 +2,8 @@ package net.forgecraft.services.ember.util;
 
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Util {
 
@@ -11,6 +13,8 @@ public class Util {
      */
     @Deprecated
     public static final List<String> KNOWN_MAVENS = List.of(
+            "https://api.modrinth.com/maven",
+            "https://cursemaven.com",
             "https://maven.blamejared.com",
             "https://modmaven.k-4u.nl",
             "https://maven.saps.dev/releases",
@@ -21,7 +25,8 @@ public class Util {
             "https://maven.creeperhost.net",
             "https://maven.minecraftforge.net",
             "https://maven.neoforged.net/releases",
-            "https://repo.spongepowered.org/maven"
+            "https://repo.spongepowered.org/maven",
+            "https://maven.uuid.gg/releases"
     );
 
     //TODO might be wise to use a different http library that allows setting default headers such as User-Agent
@@ -34,6 +39,7 @@ public class Util {
     public static HttpClient newHttpClient() {
         return HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.NORMAL)
+                .executor(Util.BACKGROUND_EXECUTOR)
                 .build();
     }
 
@@ -43,4 +49,6 @@ public class Util {
         }
         return input;
     }
+
+    public static final ExecutorService BACKGROUND_EXECUTOR = Executors.newCachedThreadPool(r -> new Thread(r, "Ember Background Worker"));
 }

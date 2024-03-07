@@ -1,5 +1,6 @@
 package net.forgecraft.services.ember.app.mods.downloader.maven;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.Downloader;
 import net.forgecraft.services.ember.app.mods.downloader.Hash;
@@ -14,6 +15,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
  * known maven repository for the artifact, downloading it if found.
  */
 public class MavenDownloader implements Downloader {
+
+    private final Map<String, String> artifactLocatorCache = new Object2ObjectOpenHashMap<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MavenDownloader.class);
     static final Pattern DEPENDENCY_NOTATION_PATTERN = Pattern.compile("maven:(?<group>[\\w.-]+):(?<artifact>[\\w.-]+):(?<version>[\\w.+-]+)(:(?<classifier>[\\w-]+))?(@(?<extension>[\\w-]+))?");
@@ -36,6 +40,7 @@ public class MavenDownloader implements Downloader {
     }
 
     //FIXME sending a HEAD request first is pointless, just try downloading immediately
+
     /**
      * Iterates through the known maven repositories and creates a head request to check if the artifact exists.
      *
@@ -43,26 +48,51 @@ public class MavenDownloader implements Downloader {
      */
     @Nullable
     private String lookupArtifact(ArtifactInfo info, HttpClient client) {
+        var cacheKey = info.group() + ":" + info.artifact();
+
+        // check cache first to not need to query all mavens all the time
+        String cachedMaven;
+        synchronized (artifactLocatorCache) {
+            cachedMaven = artifactLocatorCache.get(cacheKey);
+        }
+
+        if (cachedMaven != null && checkArtifactExists(cachedMaven, info, client)) {
+            return cachedMaven;
+        }
+
         for (String maven : knownMavenUrls) {
-            var request = HttpRequest.newBuilder()
-                    .uri(URI.create(maven + "/" + info.toUrlPath()))
-                    .HEAD()
-                    .build();
+            if (checkArtifactExists(maven, info, client)) {
 
-            LOGGER.trace("Checking {}", request.uri());
-
-            try {
-                var response = client.send(request, HttpResponse.BodyHandlers.discarding());
-                if (response.statusCode() == 200) {
-                    LOGGER.debug("Found artifact {} at {}", info, maven);
-                    return maven;
+                // update cache
+                synchronized (artifactLocatorCache) {
+                    artifactLocatorCache.put(cacheKey, maven);
                 }
-            } catch (IOException | InterruptedException e) {
-                LOGGER.error("Failed to look up artifact {} in maven {}", info, maven, e);
+
+                return maven;
             }
         }
 
         return null;
+    }
+
+    private static boolean checkArtifactExists(String maven, ArtifactInfo artifact, HttpClient client) {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(maven + "/" + artifact.toUrlPath()))
+                .HEAD()
+                .build();
+        LOGGER.trace("Checking {}", request.uri());
+
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.discarding());
+            if (response.statusCode() == 200) {
+                LOGGER.debug("Found artifact {} at {}", artifact, maven);
+                return true;
+            }
+        } catch (IOException | InterruptedException e) {
+            LOGGER.error("Failed to look up artifact {} in maven {}", artifact, maven, e);
+        }
+
+        return false;
     }
 
     @Override
@@ -81,21 +111,26 @@ public class MavenDownloader implements Downloader {
         }
 
         // It exists! try to download the hash first
-        Hash hash = downloadHashFromUrl(mavenUrl, artifact, Hash.Type.SHA512, client);
-        return new MavenDownloadInfo(mavenUrl, artifact, hash, client);
+        @Nullable Hash hash = downloadHashFromUrl(mavenUrl, artifact, Hash.Type.SHA512, client);
+        var dl = new MavenDownloadInfo(mavenUrl, artifact, hash);
+        dl.start(client);
+        return dl;
     }
 
     @Nullable
     private static Hash downloadHashFromUrl(String mavenUrl, ArtifactInfo artifact, Hash.Type hashType, HttpClient client) {
         try {
             var url = URI.create(mavenUrl + "/" + artifact.toHashFilePath(hashType));
+            LOGGER.trace("Trying to download hash file {}", url);
             var request = HttpRequest.newBuilder()
                     .uri(url)
                     .GET()
                     .build();
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                return Hash.fromString(hashType, response.body().lines().collect(Collectors.joining()).strip());
+                var rawHash = response.body().lines().collect(Collectors.joining()).strip();
+                LOGGER.trace("Hash for {} is {}", artifact, rawHash);
+                return Hash.fromString(hashType, rawHash);
             }
         } catch (Exception e) {
             // ignore exception, we'll just download the file without the hash

@@ -1,16 +1,20 @@
 package net.forgecraft.services.ember.app.mods.downloader;
 
-import net.forgecraft.services.ember.util.Util;
 import net.forgecraft.services.ember.app.mods.downloader.curseforge.CurseForgeDownloader;
 import net.forgecraft.services.ember.app.mods.downloader.maven.MavenDownloader;
 import net.forgecraft.services.ember.app.mods.downloader.modrinth.ModrinthDownloader;
 import net.forgecraft.services.ember.app.mods.downloader.plain.PlainUrlDownloader;
+import net.forgecraft.services.ember.util.Util;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public enum DownloaderFactory {
     INSTANCE;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloaderFactory.class);
 
     /**
      * The order of the downloaders is important as it will be used to determine which downloader to use first.
@@ -29,6 +33,18 @@ public enum DownloaderFactory {
             if (downloader.isAcceptable(inputData)) {
                 return downloader;
             }
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public DownloadInfo tryDownload(String inputData) {
+        var downloader = factory(inputData);
+
+        if (downloader != null) {
+            LOGGER.debug("found valid download: {}", inputData);
+            return downloader.startDownload(inputData);
         }
 
         return null;

@@ -3,6 +3,7 @@ package net.forgecraft.services.ember.app.mods.downloader.plain;
 import com.google.common.base.Preconditions;
 import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.Hash;
+import net.forgecraft.services.ember.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,24 +18,29 @@ public class SimpleDownloadInfo implements DownloadInfo {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleDownloadInfo.class);
     private final URI url;
-    private Hash hashSha512 = null;
+    private Hash hashSha512;
     private final String fileName;
-    private final CompletableFuture<byte[]> download;
+    @Nullable
+    private CompletableFuture<byte[]> download;
 
-    public SimpleDownloadInfo(URI url, HttpClient client) {
-        this(url, extractFileNameFromUrl(url), client);
+    public SimpleDownloadInfo(URI url) {
+        this(url, extractFileNameFromUrl(url), null);
     }
 
-    public SimpleDownloadInfo(URI url, String fileName, HttpClient client) {
+    public SimpleDownloadInfo(URI url, String fileName, @Nullable Hash expectedHash) {
         this.url = url;
         this.fileName = fileName;
+        setSha512(expectedHash);
+    }
+
+    public void start(HttpClient client) {
         this.download = startDownload(client);
     }
 
     protected CompletableFuture<byte[]> startDownload(HttpClient client) {
-        this.printStartMessage();
-        return client.sendAsync(HttpRequest.newBuilder(url).build(), HttpResponse.BodyHandlers.ofByteArray())
-                .thenApplyAsync(response -> {
+        return CompletableFuture.runAsync(this::printStartMessage, Util.BACKGROUND_EXECUTOR)
+                .thenComposeAsync(aVoid -> client.sendAsync(HttpRequest.newBuilder(url).build(), HttpResponse.BodyHandlers.ofByteArray()))
+                .thenApply(response -> {
                     if (response.statusCode() != 200) {
                         throw new IllegalStateException("Failed to download " + url + ": Received status code " + response.statusCode());
                     }
@@ -74,7 +80,7 @@ public class SimpleDownloadInfo implements DownloadInfo {
 
     @Override
     public boolean isComplete() {
-        return download.isDone();
+        return download != null && download.isDone();
     }
 
     @Override
@@ -84,12 +90,18 @@ public class SimpleDownloadInfo implements DownloadInfo {
 
     @Override
     public CompletableFuture<byte[]> getFileContents() {
+        if (download == null) {
+            throw new IllegalStateException("Download not started, start() must be called first!");
+        }
+
         return download;
     }
 
     @Override
     public void cancel() {
-        download.cancel(true);
+        if (download != null) {
+            download.cancel(true);
+        }
     }
 
     @Nullable

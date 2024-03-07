@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Config {
-    private DiscordConfig discord;
+    private DiscordConfig discord = DiscordConfig.create();
 
     public Config(Path configPath) {
         load(configPath);
@@ -42,10 +42,9 @@ public class Config {
             }
 
             // Write the default
-            var defaultConfig = createDefaultConfig();
             var mapper = new ObjectMapper();
             try {
-                String defaultConfigString = mapper.writeValueAsString(defaultConfig);
+                String defaultConfigString = mapper.writeValueAsString(new Config());
                 Files.writeString(path, defaultConfigString);
                 return defaultConfigString;
             } catch (IOException e) {
@@ -61,13 +60,6 @@ public class Config {
         }
     }
 
-    private static Config createDefaultConfig() {
-        var config = new Config();
-        config.discord = new DiscordConfig("YOUR_DISCORD_TOKEN", 0, new long[0]);
-
-        return config;
-    }
-
     public DiscordConfig getDiscord() {
         return discord;
     }
@@ -75,8 +67,13 @@ public class Config {
     public record DiscordConfig(
             String token,
             long guild,
-            long[] adminRoles
-    ) {}
+            long[] adminRoles,
+            long uploadChannel
+    ) {
+        public static DiscordConfig create() {
+            return new DiscordConfig("YOUR_DISCORD_TOKEN", -1, new long[0], -1);
+        }
+    }
 
     public record ServerAutomationsConfig(
             String serverPath,
