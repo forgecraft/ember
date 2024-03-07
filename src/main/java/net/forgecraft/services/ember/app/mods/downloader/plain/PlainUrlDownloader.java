@@ -32,12 +32,10 @@ public class PlainUrlDownloader implements Downloader {
     }
 
     @Override
-    public @Nullable DownloadInfo startDownload(String inputData) {
+    public @Nullable DownloadInfo createDownloadInstance(String inputData) {
         try {
             var uri = new URI(inputData);
-            var dl = new SimpleDownloadInfo(uri);
-            dl.start(clientFactory.get());
-            return dl;
+            return new SimpleDownloadInfo(uri, clientFactory.get());
         } catch (URISyntaxException e) {
             LOGGER.error("Unable to download " + inputData, e);
         }

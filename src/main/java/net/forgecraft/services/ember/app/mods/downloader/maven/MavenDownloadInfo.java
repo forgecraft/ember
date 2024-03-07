@@ -7,14 +7,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.net.http.HttpClient;
 
 class MavenDownloadInfo extends SimpleDownloadInfo {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MavenDownloadInfo.class);
     private final ArtifactInfo artifact;
 
-    public MavenDownloadInfo(String mavenURL, ArtifactInfo artifact, @Nullable Hash sha512) {
-        super(URI.create(mavenURL + "/" + artifact.toUrlPath()), artifact.getFileName(), sha512);
+    public MavenDownloadInfo(String mavenURL, ArtifactInfo artifact, @Nullable Hash sha512, HttpClient client) {
+        super(URI.create(mavenURL + "/" + artifact.toUrlPath()), artifact.getFileName(), sha512, client);
         this.artifact = artifact;
     }
 

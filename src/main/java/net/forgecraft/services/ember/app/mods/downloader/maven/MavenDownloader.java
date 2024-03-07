@@ -101,7 +101,7 @@ public class MavenDownloader implements Downloader {
     }
 
     @Override
-    public @Nullable DownloadInfo startDownload(String inputData) {
+    public @Nullable DownloadInfo createDownloadInstance(String inputData) {
         var client = clientFactory.get();
         var artifact = ArtifactInfo.fromString(inputData);
         var mavenUrl = lookupArtifact(artifact, client);
@@ -112,9 +112,7 @@ public class MavenDownloader implements Downloader {
 
         // It exists! try to download the hash first
         @Nullable Hash hash = downloadHashFromUrl(mavenUrl, artifact, Hash.Type.SHA512, client);
-        var dl = new MavenDownloadInfo(mavenUrl, artifact, hash);
-        dl.start(client);
-        return dl;
+        return new MavenDownloadInfo(mavenUrl, artifact, hash, client);
     }
 
     @Nullable

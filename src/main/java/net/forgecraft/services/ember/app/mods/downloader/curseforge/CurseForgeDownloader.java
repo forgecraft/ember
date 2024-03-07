@@ -19,7 +19,7 @@ public class CurseForgeDownloader implements Downloader {
     }
 
     @Override
-    public @Nullable DownloadInfo startDownload(String inputData) {
+    public @Nullable DownloadInfo createDownloadInstance(String inputData) {
         // TODO Implement
         throw new UnsupportedOperationException("CurseForge: " + inputData);
     }

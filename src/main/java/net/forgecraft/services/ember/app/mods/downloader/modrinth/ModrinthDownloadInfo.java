@@ -6,14 +6,15 @@ import net.forgecraft.services.ember.app.mods.downloader.plain.SimpleDownloadInf
 import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 
 public class ModrinthDownloadInfo extends SimpleDownloadInfo {
 
     private final Config.ModrinthConfig cfg;
 
-    public ModrinthDownloadInfo(URI url, String fileName, @Nullable Hash expectedHash, Config.ModrinthConfig cfg) {
-        super(url, fileName, expectedHash);
+    public ModrinthDownloadInfo(URI url, String fileName, @Nullable Hash expectedHash, HttpClient client, Config.ModrinthConfig cfg) {
+        super(url, fileName, expectedHash, client);
         this.cfg = cfg;
     }
 

@@ -16,5 +16,5 @@ public interface Downloader {
      *
      * @param inputData The input data
      */
-    @Nullable DownloadInfo startDownload(String inputData);
+    @Nullable DownloadInfo createDownloadInstance(String inputData);
 }

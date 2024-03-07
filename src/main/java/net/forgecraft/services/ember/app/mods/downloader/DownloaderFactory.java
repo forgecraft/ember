@@ -44,7 +44,11 @@ public enum DownloaderFactory {
 
         if (downloader != null) {
             LOGGER.debug("found valid download: {}", inputData);
-            return downloader.startDownload(inputData);
+            var dl = downloader.createDownloadInstance(inputData);
+            if(dl != null) {
+                dl.start();
+            }
+            return dl;
         }
 
         return null;

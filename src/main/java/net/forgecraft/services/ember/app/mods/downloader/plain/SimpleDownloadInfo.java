@@ -22,22 +22,20 @@ public class SimpleDownloadInfo implements DownloadInfo {
     private final String fileName;
     @Nullable
     private CompletableFuture<byte[]> download;
+    private final HttpClient client;
 
-    public SimpleDownloadInfo(URI url) {
-        this(url, extractFileNameFromUrl(url), null);
+    public SimpleDownloadInfo(URI url, HttpClient client) {
+        this(url, extractFileNameFromUrl(url), null, client);
     }
 
-    public SimpleDownloadInfo(URI url, String fileName, @Nullable Hash expectedHash) {
+    public SimpleDownloadInfo(URI url, String fileName, @Nullable Hash expectedHash, HttpClient client) {
         this.url = url;
         this.fileName = fileName;
+        this.client = client;
         setSha512(expectedHash);
     }
 
-    public void start(HttpClient client) {
-        this.download = startDownload(client);
-    }
-
-    protected CompletableFuture<byte[]> startDownload(HttpClient client) {
+    protected CompletableFuture<byte[]> startDownload() {
         return CompletableFuture.runAsync(this::printStartMessage, Util.BACKGROUND_EXECUTOR)
                 .thenComposeAsync(aVoid -> client.sendAsync(createRequestBuilder().build(), HttpResponse.BodyHandlers.ofByteArray()))
                 .thenApply(response -> {
@@ -95,10 +93,15 @@ public class SimpleDownloadInfo implements DownloadInfo {
     @Override
     public CompletableFuture<byte[]> getFileContents() {
         if (download == null) {
-            throw new IllegalStateException("Download not started, start() must be called first!");
+            start();
         }
 
         return download;
+    }
+
+    @Override
+    public void start() {
+        this.download = startDownload();
     }
 
     @Override

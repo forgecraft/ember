@@ -50,7 +50,7 @@ public class ModrinthDownloader implements Downloader {
     }
 
     @Override
-    public @Nullable DownloadInfo startDownload(String inputData) {
+    public @Nullable DownloadInfo createDownloadInstance(String inputData) {
         var client = clientFactory.get();
 
         String project = null;
@@ -111,9 +111,7 @@ public class ModrinthDownloader implements Downloader {
             // TODO parse and download required dependencies
             // https://docs.modrinth.com/#tag/project_result_model
 
-            var dl = new ModrinthDownloadInfo(primaryFile.url(), primaryFile.filename(), hash, cfg);
-            dl.start(client);
-            return dl;
+            return new ModrinthDownloadInfo(primaryFile.url(), primaryFile.filename(), hash, client, cfg);
 
         } catch (UncheckedIOException | IOException | InterruptedException e) {
             LOGGER.error("Failed to look up modrinth version {} at {}", version, request.uri(), e);

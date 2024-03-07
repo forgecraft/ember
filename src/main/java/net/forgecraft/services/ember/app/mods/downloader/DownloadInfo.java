@@ -22,5 +22,7 @@ public interface DownloadInfo {
 
     CompletableFuture<byte[]> getFileContents();
 
+    void start();
+
     void cancel();
 }

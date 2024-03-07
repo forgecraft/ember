@@ -27,7 +27,7 @@ public class MavenDownloaderTest {
 
             assertInstanceOf(MavenDownloader.class, downloader);
 
-            var download = downloader.download(joinedInputData);
+            var download = downloader.createDownloadInstance(joinedInputData);
             assertNotNull(download);
         }
     }
