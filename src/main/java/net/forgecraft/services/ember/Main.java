@@ -3,6 +3,7 @@ package net.forgecraft.services.ember;
 
 import net.forgecraft.services.ember.app.Services;
 import net.forgecraft.services.ember.bot.listener.ModUploadListener;
+import net.forgecraft.services.ember.db.DatabaseManager;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
@@ -36,6 +37,9 @@ public final class Main {
     // Real application start
     public Main(Cli opts) {
         this.services = new Services(opts.configPath);
+        try (var ctx = services.getDbConnection()) {
+            DatabaseManager.bootstrapDatabase(ctx);
+        }
         this.discordApi = new DiscordApiBuilder()
                 .setToken(services.getConfig().getDiscord().token())
                 .addIntents(

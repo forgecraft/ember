@@ -42,6 +42,7 @@ dependencies {
 
     implementation("org.jooq:jooq:3.19.5")
     sourceSets.getByName("database").implementationConfigurationName("org.jooq:jooq:3.19.5")
+    sourceSets.getByName("generated").implementationConfigurationName("org.jooq:jooq:3.19.5")
 
     runtimeOnly("org.xerial:sqlite-jdbc:3.45.1.0")
     sourceSets.getByName("database").runtimeOnlyConfigurationName("org.xerial:sqlite-jdbc:3.45.1.0")
@@ -58,6 +59,8 @@ dependencies {
     compileOnly("org.jetbrains:annotations:24.1.0")
     sourceSets.getByName("database").compileOnlyConfigurationName("org.jetbrains:annotations:24.1.0")
 
+    implementation(sourceSets.getByName("database").output)
+    implementation(sourceSets.getByName("generated").output)
 }
 
 tasks.withType(JavaCompile::class).configureEach {
@@ -66,9 +69,6 @@ tasks.withType(JavaCompile::class).configureEach {
 }
 
 tasks.named("compileJava", JavaCompile::class).configure {
-    source(sourceSets.getByName("generated").allJava)
-    source(sourceSets.getByName("database").allJava)
-
     options.compilerArgs.add("-Aproject=${project.group}/${project.name}")
 }
 
