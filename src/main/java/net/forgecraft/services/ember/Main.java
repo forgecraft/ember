@@ -25,7 +25,7 @@ public final class Main {
         LOGGER.info("Starting application...");
 
         var opts = CommandLine.populateSpec(Main.Cli.class, args);
-        if(opts.helpRequested) {
+        if (opts.helpRequested) {
             CommandLine.usage(opts, System.out);
             return;
         }
