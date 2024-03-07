@@ -38,6 +38,7 @@ dependencies {
     // Jackson
     implementation("com.fasterxml.jackson.core:jackson-core:2.16.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
+    runtimeOnly("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.16.1")
 
     implementation("org.jooq:jooq:3.19.5")
     sourceSets.getByName("database").implementationConfigurationName("org.jooq:jooq:3.19.5")

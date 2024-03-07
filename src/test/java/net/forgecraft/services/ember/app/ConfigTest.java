@@ -6,46 +6,49 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ConfigTest {
     @Test
-    public void configLoadAndWritesDefault() {
-        var config = new Config("tests/config.json");
+    public void configWritesDefault() {
+        var configPath = Path.of("tests/config.json");
 
-        assertNotNull(config);
-        assertNotNull(config.getDiscord());
+        Config.load(configPath);
 
-        assertEquals("YOUR_DISCORD", config.getDiscord().token());
+        assertTrue(Files.exists(configPath));
     }
 
     @Test
-    public void readsConfigCorrectly() {
+    public void defaultConfigParsesCorrectly() {
+        var configPath = Path.of("tests/config.json");
         // Write the default config
-        new Config("tests/config.json");
+        Config.load(configPath);
 
         // Read the config
-        var config = new Config("tests/config.json");
+        var config = Config.load(configPath);
 
         assertNotNull(config);
         assertNotNull(config.getDiscord());
+        assertNotNull(config.getModrinth());
 
-        assertEquals("YOUR_DISCORD", config.getDiscord().token());
+        assertEquals(Config.DiscordConfig.create(), config.getDiscord());
+        assertEquals(Config.ModrinthConfig.create(), config.getModrinth());
     }
 
     @BeforeAll
     public static void setup() throws IOException {
         // Setup the test folder
-        var testFolder = Path.of("./tests");
-        FileUtils.createParentDirectories(testFolder.toFile());
+        var testFolder = Path.of("tests");
+        Files.createDirectories(testFolder);
     }
 
     @AfterAll
     public static void cleanup() throws IOException {
         // Cleanup the test folder
-        var testFolder = Path.of("./tests");
+        var testFolder = Path.of("tests");
         FileUtils.deleteDirectory(testFolder.toFile());
     }
 }

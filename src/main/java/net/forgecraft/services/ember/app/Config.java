@@ -1,35 +1,40 @@
 package net.forgecraft.services.ember.app;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class Config {
-    private DiscordConfig discord = DiscordConfig.create();
 
-    public Config(Path configPath) {
-        load(configPath);
-    }
+    private static final ObjectMapper JACKSON_MAPPER = JsonMapper.builder()
+            .findAndAddModules()
+            .serializationInclusion(JsonInclude.Include.NON_ABSENT)
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .build();
+
+    private final DiscordConfig discord = DiscordConfig.create();
+    private final ModrinthConfig modrinth = ModrinthConfig.create();
 
     // For jackson
-    public Config() {}
+    public Config() {
+    }
 
-    public void load(Path path) {
-        var configRaw = this.loadFromPath(path);
-
-        var mapper = new ObjectMapper();
-        try {
-            var appConfig = mapper.readValue(configRaw, Config.class);
-
-            this.discord = appConfig.discord;
+    public static Config load(Path path) {
+        try (var stream = loadFromPath(path)) {
+            return JACKSON_MAPPER.readValue(stream, Config.class);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unable to read config file", e);
         }
     }
 
-    private String loadFromPath(Path path) throws RuntimeException {
+    private static InputStream loadFromPath(Path path) throws IOException {
         if (Files.notExists(path)) {
             // Create it
             var parent = path.getParent();
@@ -42,26 +47,21 @@ public class Config {
             }
 
             // Write the default
-            var mapper = new ObjectMapper();
-            try {
-                String defaultConfigString = mapper.writeValueAsString(new Config());
-                Files.writeString(path, defaultConfigString);
-                return defaultConfigString;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            try (var writer = Files.newBufferedWriter(path)) {
+                JACKSON_MAPPER.writeValue(writer, new Config());
             }
         }
 
         // We exist so just read it
-        try {
-            return Files.readString(path);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return Files.newInputStream(path);
     }
 
     public DiscordConfig getDiscord() {
         return discord;
+    }
+
+    public ModrinthConfig getModrinth() {
+        return modrinth;
     }
 
     public record DiscordConfig(
@@ -79,5 +79,14 @@ public class Config {
             String serverPath,
             String slug,
             long serverUpdateChannel
-    ) {}
+    ) {
+    }
+
+    public record ModrinthConfig(
+            Optional<String> accessToken
+    ) {
+        public static ModrinthConfig create() {
+            return new ModrinthConfig(Optional.empty());
+        }
+    }
 }

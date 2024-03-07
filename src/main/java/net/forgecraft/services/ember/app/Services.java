@@ -9,7 +9,7 @@ public class Services {
     private final Config config;
 
     public Services(Path configPath) {
-        this.config = new Config(configPath);
+        this.config = Config.load(configPath);
     }
 
     public Config getConfig() {
