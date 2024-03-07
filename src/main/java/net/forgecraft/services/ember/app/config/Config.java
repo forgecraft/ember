@@ -1,4 +1,4 @@
-package net.forgecraft.services.ember.app;
+package net.forgecraft.services.ember.app.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
+import java.util.List;
 
 public class Config {
 
@@ -19,12 +19,11 @@ public class Config {
             .enable(SerializationFeature.INDENT_OUTPUT)
             .build();
 
+    private final GeneralConfig general = GeneralConfig.create();
     private final DiscordConfig discord = DiscordConfig.create();
     private final ModrinthConfig modrinth = ModrinthConfig.create();
+    private final List<MinecraftServerConfig> minecraftServers = List.of(MinecraftServerConfig.create());
 
-    // For jackson
-    public Config() {
-    }
 
     public static Config load(Path path) {
         try (var stream = loadFromPath(path)) {
@@ -56,6 +55,10 @@ public class Config {
         return Files.newInputStream(path);
     }
 
+    public GeneralConfig getGeneral() {
+        return general;
+    }
+
     public DiscordConfig getDiscord() {
         return discord;
     }
@@ -64,29 +67,8 @@ public class Config {
         return modrinth;
     }
 
-    public record DiscordConfig(
-            String token,
-            long guild,
-            long[] adminRoles,
-            long uploadChannel
-    ) {
-        public static DiscordConfig create() {
-            return new DiscordConfig("YOUR_DISCORD_TOKEN", -1, new long[0], -1);
-        }
+    public List<MinecraftServerConfig> getMinecraftServers() {
+        return minecraftServers;
     }
 
-    public record ServerAutomationsConfig(
-            String serverPath,
-            String slug,
-            long serverUpdateChannel
-    ) {
-    }
-
-    public record ModrinthConfig(
-            Optional<String> accessToken
-    ) {
-        public static ModrinthConfig create() {
-            return new ModrinthConfig(Optional.empty());
-        }
-    }
 }

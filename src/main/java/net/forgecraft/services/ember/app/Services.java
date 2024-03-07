@@ -1,5 +1,7 @@
 package net.forgecraft.services.ember.app;
 
+import net.forgecraft.services.ember.app.config.Config;
+
 import java.nio.file.Path;
 
 /**

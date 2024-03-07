@@ -1,6 +1,6 @@
 package net.forgecraft.services.ember.app.mods.downloader.modrinth;
 
-import net.forgecraft.services.ember.app.Config;
+import net.forgecraft.services.ember.app.config.ModrinthConfig;
 import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.Downloader;
 import net.forgecraft.services.ember.app.mods.downloader.Hash;
@@ -34,10 +34,10 @@ public class ModrinthDownloader implements Downloader {
     private static final Pattern MODRINTH_URL_PATTERN = Pattern.compile("https://(www\\.)?modrinth\\.com/mod/(?<project>.+)/version/(?<version>.+)");
     private static final Logger LOGGER = LoggerFactory.getLogger(ModrinthDownloader.class);
 
-    private final Config.ModrinthConfig cfg;
+    private final ModrinthConfig cfg;
     private final Supplier<HttpClient> clientFactory;
 
-    public ModrinthDownloader(Config.ModrinthConfig cfg, Supplier<HttpClient> clientFactory) {
+    public ModrinthDownloader(ModrinthConfig cfg, Supplier<HttpClient> clientFactory) {
         this.cfg = cfg;
         this.clientFactory = clientFactory;
     }
@@ -120,7 +120,7 @@ public class ModrinthDownloader implements Downloader {
         return null;
     }
 
-    static HttpRequest.Builder addAuthHeader(HttpRequest.Builder builder, Config.ModrinthConfig cfg) {
+    static HttpRequest.Builder addAuthHeader(HttpRequest.Builder builder, ModrinthConfig cfg) {
         cfg.accessToken().ifPresent(token -> builder.header("Authorization", token));
         return builder;
     }

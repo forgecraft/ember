@@ -1,5 +1,8 @@
 package net.forgecraft.services.ember.app;
 
+import net.forgecraft.services.ember.app.config.Config;
+import net.forgecraft.services.ember.app.config.DiscordConfig;
+import net.forgecraft.services.ember.app.config.ModrinthConfig;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,8 +37,8 @@ public class ConfigTest {
         assertNotNull(config.getDiscord());
         assertNotNull(config.getModrinth());
 
-        assertEquals(Config.DiscordConfig.create(), config.getDiscord());
-        assertEquals(Config.ModrinthConfig.create(), config.getModrinth());
+        assertEquals(DiscordConfig.create(), config.getDiscord());
+        assertEquals(ModrinthConfig.create(), config.getModrinth());
     }
 
     @BeforeAll

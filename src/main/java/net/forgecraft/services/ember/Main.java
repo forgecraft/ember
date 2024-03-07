@@ -52,7 +52,7 @@ public final class Main {
             }
         });
 
-        this.discordApi.addMessageCreateListener(new ModUploadListener(services.getConfig().getDiscord()));
+        this.discordApi.addMessageCreateListener(new ModUploadListener(services.getConfig()));
     }
 
     public Services services() {

@@ -1,6 +1,10 @@
 package net.forgecraft.services.ember.bot.listener;
 
-import net.forgecraft.services.ember.app.Config;
+import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import net.forgecraft.services.ember.app.config.Config;
+import net.forgecraft.services.ember.app.config.GeneralConfig;
+import net.forgecraft.services.ember.app.config.MinecraftServerConfig;
 import net.forgecraft.services.ember.app.mods.downloader.DownloadHelper;
 import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.DownloaderFactory;
@@ -13,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,23 +33,28 @@ public class ModUploadListener implements MessageCreateListener {
     private static final String STATUS_ERROR = "⚠";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModUploadListener.class);
-    private final Config.DiscordConfig cfg;
+    private final GeneralConfig cfg;
+    private final Long2ObjectMap<MinecraftServerConfig> minecraftServers = new Long2ObjectArrayMap<>();
 
-    public ModUploadListener(Config.DiscordConfig cfg) {
-        this.cfg = cfg;
+    public ModUploadListener(Config cfg) {
+        this.cfg = cfg.getGeneral();
+        for (MinecraftServerConfig server : cfg.getMinecraftServers()) {
+            minecraftServers.put(server.uploadChannel(), server);
+        }
     }
 
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
-        // not our channel, ignore message
-        if (event.getChannel().getId() != cfg.uploadChannel()) {
-            return;
-        }
-
         var msg = event.getMessage();
 
         // only listen to messages sent by users
         if (msg.getType() != MessageType.NORMAL) {
+            return;
+        }
+
+        var serverCfg = minecraftServers.get(msg.getChannel().getId());
+        if (serverCfg == null) {
+            // don't know this channel, ignore message
             return;
         }
 
@@ -88,17 +96,17 @@ public class ModUploadListener implements MessageCreateListener {
                 return;
             }
 
-            //TODO save downloads to global dir and DB
+            //TODO save downloads to DB
 
             AtomicBoolean errored = new AtomicBoolean(false);
 
             CompletableFuture.allOf(downloads.stream().map(download -> download.getFileContents().thenAcceptAsync(bytes -> {
                         var hash = Objects.requireNonNull(download.getSha512()).stringValue();
-                        var target = Path.of(".").resolve(hash).resolve(download.getFileName());
                         try {
+                            var target = serverCfg.getNameAsPath(cfg.storageDir()).resolve(hash).resolve(download.getFileName());
                             DownloadHelper.saveTo(target, bytes);
                         } catch (IOException e) {
-                            LOGGER.error("error saving file: {}", target, e);
+                            LOGGER.error("error saving file: {}", download.getFileName(), e);
                         }
                     }).exceptionally(ex -> {
                         LOGGER.error("Download error on {}", download.getUrl(), ex);
