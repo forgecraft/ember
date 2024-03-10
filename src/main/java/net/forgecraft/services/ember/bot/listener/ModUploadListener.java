@@ -1,10 +1,12 @@
 package net.forgecraft.services.ember.bot.listener;
 
+import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.forgecraft.services.ember.app.config.Config;
 import net.forgecraft.services.ember.app.config.GeneralConfig;
 import net.forgecraft.services.ember.app.config.MinecraftServerConfig;
+import net.forgecraft.services.ember.app.mods.ModFileManager;
 import net.forgecraft.services.ember.app.mods.downloader.DownloadHelper;
 import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.DownloaderFactory;
@@ -17,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -96,26 +99,30 @@ public class ModUploadListener implements MessageCreateListener {
                 return;
             }
 
-            //TODO save downloads to DB
+            var uploader = msg.getAuthor().asUser().orElseThrow();
 
             AtomicBoolean errored = new AtomicBoolean(false);
 
-            CompletableFuture.allOf(downloads.stream().map(download -> download.getFileContents().thenAcceptAsync(bytes -> {
-                        var hash = Objects.requireNonNull(download.getSha512()).stringValue();
-                        try {
-                            var target = serverCfg.getNameAsPath(cfg.storageDir()).resolve(hash).resolve(download.getFileName());
-                            DownloadHelper.saveTo(target, bytes);
-                        } catch (IOException e) {
-                            LOGGER.error("error saving file: {}", download.getFileName(), e);
-                        }
-                    }).exceptionally(ex -> {
-                        LOGGER.error("Download error on {}", download.getUrl(), ex);
-                        errored.set(true);
-                        msg.addReaction(STATUS_ERROR);
-                        return null;
-                    })).toArray(CompletableFuture[]::new))
-                    .thenComposeAsync(aVoid -> msg.removeReactionByEmoji(STATUS_PROCESSING))
-                    .thenRunAsync(() -> {
+            CompletableFuture.allOf(downloads.stream().map(download -> download.getFileContents()
+                            .thenApplyAsync(bytes -> {
+                                var hash = Objects.requireNonNull(download.getSha512());
+                                var hashString = hash.stringValue();
+                                try {
+                                    var target = serverCfg.getNameAsPath(cfg.storageDir()).resolve(hashString).resolve(download.getFileName());
+                                    DownloadHelper.saveTo(target, bytes);
+                                    return Pair.of(hash, target);
+                                } catch (IOException e) {
+                                    throw new UncheckedIOException("error saving file", e);
+                                }
+                            }, Util.BACKGROUND_EXECUTOR)
+                            .thenCompose(data -> ModFileManager.recordDownload(data.left(), data.right(), uploader)).exceptionally(ex -> {
+                                LOGGER.error("Download error on {}", download.getUrl(), ex);
+                                errored.set(true);
+                                msg.addReaction(STATUS_ERROR);
+                                return null;
+                            })).toArray(CompletableFuture[]::new))
+                    .thenRun(() -> {
+                        msg.removeReactionByEmoji(STATUS_PROCESSING);
                         if (!errored.get()) {
                             msg.addReaction(STATUS_SUCCESS);
                         }

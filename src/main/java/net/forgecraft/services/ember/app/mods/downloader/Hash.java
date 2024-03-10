@@ -48,4 +48,8 @@ public record Hash(Type type, HashCode value) {
     public String stringValue() {
         return value().toString();
     }
+
+    public byte[] byteValue() {
+        return value().asBytes();
+    }
 }

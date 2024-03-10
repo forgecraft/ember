@@ -1,9 +1,6 @@
 package net.forgecraft.services.ember.app.config;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import net.forgecraft.services.ember.util.Util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,12 +10,6 @@ import java.util.List;
 
 public class Config {
 
-    private static final ObjectMapper JACKSON_MAPPER = JsonMapper.builder()
-            .findAndAddModules()
-            .serializationInclusion(JsonInclude.Include.NON_ABSENT)
-            .enable(SerializationFeature.INDENT_OUTPUT)
-            .build();
-
     private final GeneralConfig general = GeneralConfig.create();
     private final DiscordConfig discord = DiscordConfig.create();
     private final ModrinthConfig modrinth = ModrinthConfig.create();
@@ -27,7 +18,7 @@ public class Config {
 
     public static Config load(Path path) {
         try (var stream = loadFromPath(path)) {
-            return JACKSON_MAPPER.readValue(stream, Config.class);
+            return Util.JACKSON_MAPPER.readValue(stream, Config.class);
         } catch (IOException e) {
             throw new RuntimeException("Unable to read config file", e);
         }
@@ -47,7 +38,7 @@ public class Config {
 
             // Write the default
             try (var writer = Files.newBufferedWriter(path)) {
-                JACKSON_MAPPER.writeValue(writer, new Config());
+                Util.JACKSON_MAPPER.writeValue(writer, new Config());
             }
         }
 

@@ -52,6 +52,7 @@ dependencies {
     implementation("commons-io:commons-io:2.15.1")
     implementation("com.google.guava:guava:33.0.0-jre")
     implementation("it.unimi.dsi:fastutil:8.5.13")
+    implementation("com.electronwill.night-config:toml:3.6.7")
 
     implementation("info.picocli:picocli:4.7.5")
     annotationProcessor("info.picocli:picocli-codegen:4.7.5")

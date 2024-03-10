@@ -1,5 +1,10 @@
 package net.forgecraft.services.ember.util;
 
+import com.electronwill.nightconfig.toml.TomlParser;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import net.forgecraft.services.ember.Main;
 import net.forgecraft.services.ember.app.Services;
 
@@ -33,11 +38,11 @@ public class Util {
     );
 
     //TODO might be wise to use a different http library that allows setting default headers such as User-Agent
+
     /**
+     * @return a new {@link HttpClient} that follows redirects
      * @implNote Need to use the builder because the default HTTP client does not follow any redirects.
      * We change this so it does, except for redirects to less secure URLs, i.e. https to http
-     *
-     * @return a new {@link HttpClient} that follows redirects
      */
     public static HttpClient newHttpClient() {
         return HttpClient.newBuilder()
@@ -58,4 +63,15 @@ public class Util {
     }
 
     public static final ExecutorService BACKGROUND_EXECUTOR = Executors.newCachedThreadPool(r -> new Thread(r, "Ember Background Worker"));
+
+    public static final ObjectMapper JACKSON_MAPPER = JsonMapper.builder()
+            .findAndAddModules()
+            .serializationInclusion(JsonInclude.Include.NON_ABSENT)
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .build();
+
+    public static final TomlParser TOML_PARSER = new TomlParser();
+
+    // system properties
+    public static final boolean OPT_ALLOW_INSECURE_DOWNLOADS = System.getenv("ALLOW_INSECURE_DOWNLOADS") != null && !"false".equalsIgnoreCase(System.getenv("ALLOW_INSECURE_DOWNLOADS"));
 }
