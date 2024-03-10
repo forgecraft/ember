@@ -1,7 +1,6 @@
 package net.forgecraft.services.ember.app.config;
 
 import java.io.IOException;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Locale;
 
@@ -16,10 +15,11 @@ public record MinecraftServerConfig(
     }
 
     public Path getNameAsPath(Path root) throws IOException {
-        var real = root.resolve(name().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9._]", "_")).toRealPath(LinkOption.NOFOLLOW_LINKS);
-        if (!real.startsWith(root)) {
-            throw new IOException("Path " + real + " is outside of parent directory " + root);
+        // sadly cannot use Path#toRealPath because it doesn't work with non-existent paths
+        var normalized = root.resolve(name().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9._]", "_")).normalize().toAbsolutePath();
+        if (!normalized.startsWith(root.normalize().toAbsolutePath())) {
+            throw new IOException("Path " + normalized + " is outside of parent directory " + root);
         }
-        return real;
+        return normalized;
     }
 }
