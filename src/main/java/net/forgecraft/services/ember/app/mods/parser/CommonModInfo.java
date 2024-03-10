@@ -1,4 +1,4 @@
-package net.forgecraft.services.ember.app.mods;
+package net.forgecraft.services.ember.app.mods.parser;
 
 import java.util.Optional;
 

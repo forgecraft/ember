@@ -1,10 +1,9 @@
-package net.forgecraft.services.ember.app.mods;
+package net.forgecraft.services.ember.app.mods.parser;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import net.forgecraft.services.ember.app.mods.parser.FabricModJson;
 import net.forgecraft.services.ember.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

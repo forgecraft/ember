@@ -1,6 +1,6 @@
 package net.forgecraft.services.ember.mods.downloader;
 
-import net.forgecraft.services.ember.app.mods.ModInfoParser;
+import net.forgecraft.services.ember.app.mods.parser.ModInfoParser;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;

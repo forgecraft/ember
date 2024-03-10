@@ -115,7 +115,8 @@ public class ModUploadListener implements MessageCreateListener {
                                     throw new UncheckedIOException("error saving file", e);
                                 }
                             }, Util.BACKGROUND_EXECUTOR)
-                            .thenCompose(data -> ModFileManager.recordDownload(data.left(), data.right(), uploader)).exceptionally(ex -> {
+                            .thenCompose(data -> ModFileManager.handleDownload(data.left(), data.right(), uploader, serverCfg))
+                            .exceptionally(ex -> {
                                 LOGGER.error("Download error on {}", download.getUrl(), ex);
                                 errored.set(true);
                                 msg.addReaction(STATUS_ERROR);

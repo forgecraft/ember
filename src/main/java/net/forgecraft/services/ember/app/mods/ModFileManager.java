@@ -1,7 +1,10 @@
 package net.forgecraft.services.ember.app.mods;
 
 import com.google.common.base.Preconditions;
+import net.forgecraft.services.ember.app.config.MinecraftServerConfig;
 import net.forgecraft.services.ember.app.mods.downloader.Hash;
+import net.forgecraft.services.ember.app.mods.parser.CommonModInfo;
+import net.forgecraft.services.ember.app.mods.parser.ModInfoParser;
 import net.forgecraft.services.ember.util.Util;
 import org.javacord.api.entity.user.User;
 
@@ -15,9 +18,15 @@ import static net.forgecraft.services.ember.db.schema.Tables.*;
 
 public class ModFileManager {
 
-    public static CompletableFuture<Void> recordDownload(Hash sha512, Path filePath, User discordUser) {
+    public static CompletableFuture<Void> handleDownload(Hash sha512, Path filePath, User discordUser, MinecraftServerConfig serverConfig) {
+        return recordDownload(sha512, filePath, discordUser).thenAccept(modInfo -> {
+            //TODO copy new file and delete old file
+        });
+    }
+
+    public static CompletableFuture<CommonModInfo> recordDownload(Hash sha512, Path filePath, User discordUser) {
         Preconditions.checkArgument(sha512.type() == Hash.Type.SHA512, "Hash type must be SHA-512");
-        return CompletableFuture.runAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
 
             var snowflake = discordUser.getId();
             var userDisplayName = discordUser.getName();
@@ -87,6 +96,7 @@ public class ModFileManager {
                     //TODO audit log
                 });
             }
+            return modInfoList.getFirst();
         }, Util.BACKGROUND_EXECUTOR);
     }
 }

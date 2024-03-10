@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.google.common.base.Preconditions;
-import net.forgecraft.services.ember.app.mods.CommonModInfo;
 
 import java.io.IOException;
 import java.util.List;
