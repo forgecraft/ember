@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class Main {
@@ -37,6 +39,14 @@ public final class Main {
     // Real application start
     public Main(Cli opts) {
         this.services = new Services(opts.configPath);
+
+        try {
+            var dbPath = services.getConfig().getGeneral().databasePath();
+            Files.createDirectories(dbPath.getParent());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create database directory", e);
+        }
+
         try (var ctx = services.getDbConnection()) {
             DatabaseManager.bootstrapDatabase(ctx);
         }

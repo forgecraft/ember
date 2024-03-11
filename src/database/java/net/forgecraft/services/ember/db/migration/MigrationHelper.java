@@ -5,6 +5,7 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -48,7 +49,7 @@ public class MigrationHelper {
             System.out.println("Found " + pendingMigrations.size() + " pending migrations.");
         } catch (IOException e) {
             // TODO logging
-            throw new RuntimeException("unable to apply migrations", e);
+            throw new UncheckedIOException("unable to apply migrations", e);
         } catch (URISyntaxException e) {
             // should NEVER happen
             throw new RuntimeException(e);

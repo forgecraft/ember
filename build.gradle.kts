@@ -7,6 +7,7 @@ plugins {
     application
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.3"
     id("org.jooq.jooq-codegen-gradle") version "3.19.5"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 val javaVersion = 21
@@ -64,6 +65,15 @@ dependencies {
     implementation(sourceSets.getByName("generated").output)
 }
 
+tasks.named("shadowJar", Jar::class).configure {
+    archiveClassifier.set("")
+    archiveVersion.set(project.version.toString())
+}
+
+tasks.named("jar", Jar::class).configure {
+    archiveClassifier.set("slim")
+}
+
 tasks.withType(JavaCompile::class).configureEach {
     options.encoding = "UTF-8"
     options.release.set(javaVersion)
@@ -86,7 +96,7 @@ jooq {
 
         jdbc {
             driver = "org.sqlite.JDBC"
-            url = "jdbc:sqlite:${project.file("run/data/sqlite.db").absolutePath}"
+            url = "jdbc:sqlite:${project.file("run/data/sqlite.db").path}"
         }
 
         generator {
@@ -102,7 +112,7 @@ jooq {
 
             target {
                 packageName = "net.forgecraft.services.ember.db.schema"
-                directory = project.file("src/generated/java").absolutePath
+                directory = project.file("src/generated/java").path
             }
         }
     }
@@ -117,14 +127,14 @@ idea.project.settings {
             mainClass = "net.forgecraft.services.ember.Main"
             programParameters = "--config=config.json"
             moduleName = "${project.name}.main"
-            workingDirectory = project.file("run").absolutePath
+            workingDirectory = project.file("run").path
         }
 
         register("Bootstrap Database", Application::class) {
             project.file("run").mkdirs()
             mainClass = "net.forgecraft.services.ember.db.Main"
             moduleName = "${project.name}.database"
-            workingDirectory = project.file("run").absolutePath
+            workingDirectory = project.file("run").path
         }
     }
 }
@@ -132,7 +142,7 @@ idea.project.settings {
 // configure the java application plugin for CI and anyone not using IDEA
 application {
     mainClass.set("net.forgecraft.services.ember.Main")
-    executableDir = project.file("run").absolutePath
+    executableDir = project.file("run").path
 }
 
 tasks.named("run", JavaExec::class) {
