@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS mod_files (
     mod_id TEXT NOT NULL,
     uploader_id BIGINT NOT NULL,
     mod_version TEXT NOT NULL,
-    active BOOLEAN DEFAULT TRUE,
+    active BOOLEAN DEFAULT FALSE,
     file_name TEXT NOT NULL, -- file name as uploaded
     sha_512 BLOB NOT NULL, -- hash of file contents
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -91,7 +91,7 @@ public class ModFileManager {
                                     MOD_FILES.SHA_512
                             )
                             .values(rootMod.id(), snowflake, rootMod.version(), fileName, sha512.byteValue())
-                            .onConflict(MOD_FILES.MOD_ID, MOD_FILES.SHA_512).doUpdate().set(MOD_FILES.ACTIVE, true).execute();
+                            .onConflictDoNothing().execute();
 
                     //TODO audit log
                 });
