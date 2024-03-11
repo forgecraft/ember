@@ -5,7 +5,6 @@ FROM mcr.microsoft.com/openjdk/jdk:${JAVA_VERSON}-distroless
 WORKDIR /app
 
 VOLUME /app/data
-VOLUME /app/config
 
 ENV CONFIG_FILE=/app/config.json
 
