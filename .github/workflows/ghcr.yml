@@ -6,6 +6,8 @@ on:
       - '.github/**'
     branches:
       - '*'
+    tags:
+      - '*'
 
 jobs:
   build:
