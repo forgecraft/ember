@@ -7,6 +7,7 @@ package net.forgecraft.services.ember.db.schema;
 import java.util.Arrays;
 import java.util.List;
 
+import net.forgecraft.services.ember.db.schema.tables.ApprovalQueue;
 import net.forgecraft.services.ember.db.schema.tables.AuditLog;
 import net.forgecraft.services.ember.db.schema.tables.DiscordUsers;
 import net.forgecraft.services.ember.db.schema.tables.ModFiles;
@@ -30,6 +31,11 @@ public class DefaultSchema extends SchemaImpl {
      * The reference instance of <code>DEFAULT_SCHEMA</code>
      */
     public static final DefaultSchema DEFAULT_SCHEMA = new DefaultSchema();
+
+    /**
+     * The table <code>approval_queue</code>.
+     */
+    public final ApprovalQueue APPROVAL_QUEUE = ApprovalQueue.APPROVAL_QUEUE;
 
     /**
      * The table <code>audit_log</code>.
@@ -72,6 +78,7 @@ public class DefaultSchema extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
+            ApprovalQueue.APPROVAL_QUEUE,
             AuditLog.AUDIT_LOG,
             DiscordUsers.DISCORD_USERS,
             ModFiles.MOD_FILES,

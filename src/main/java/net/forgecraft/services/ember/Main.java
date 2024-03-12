@@ -2,6 +2,7 @@ package net.forgecraft.services.ember;
 
 
 import net.forgecraft.services.ember.app.Services;
+import net.forgecraft.services.ember.bot.listener.ModApprovalListener;
 import net.forgecraft.services.ember.bot.listener.ModUploadListener;
 import net.forgecraft.services.ember.db.DatabaseManager;
 import org.javacord.api.DiscordApi;
@@ -53,9 +54,11 @@ public final class Main {
         this.discordApi = new DiscordApiBuilder()
                 .setToken(services.getConfig().getDiscord().token())
                 .addIntents(
+                        Intent.GUILDS,
                         Intent.GUILD_MESSAGES, // general message events
-                        Intent.GUILD_MESSAGE_REACTIONS, // reactions as triggers
-                        Intent.MESSAGE_CONTENT // read message contents for mod uploads
+                        Intent.MESSAGE_CONTENT, // read message contents for mod uploads
+                        Intent.GUILD_MESSAGE_REACTIONS, // read reactions for mod approvals
+                        Intent.GUILD_MEMBERS // read member list for admin role checks
                 )
                 .login()
                 .join();
@@ -67,6 +70,7 @@ public final class Main {
         });
 
         this.discordApi.addMessageCreateListener(new ModUploadListener(services.getConfig()));
+        this.discordApi.addReactionAddListener(new ModApprovalListener(services.getConfig()));
     }
 
     public Services services() {

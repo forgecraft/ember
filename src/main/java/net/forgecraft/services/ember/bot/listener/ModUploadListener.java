@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -94,8 +95,8 @@ public class ModUploadListener implements MessageCreateListener {
 
             if (downloads.isEmpty()) {
                 // unable to find any download target, cancel further processing
-                msg.removeReactionByEmoji(STATUS_PROCESSING);
-                msg.addReaction(STATUS_INVALID_MESSAGE);
+                msg.addReaction(STATUS_INVALID_MESSAGE)
+                        .thenCompose(aVoid -> msg.removeOwnReactionByEmoji(STATUS_PROCESSING)).join();
                 return;
             }
 
@@ -106,28 +107,33 @@ public class ModUploadListener implements MessageCreateListener {
             CompletableFuture.allOf(downloads.stream().map(download -> download.getFileContents()
                             .thenApplyAsync(bytes -> {
                                 var hash = Objects.requireNonNull(download.getSha512());
-                                var hashString = hash.stringValue();
                                 try {
-                                    var target = serverCfg.getNameAsPath(cfg.storageDir()).resolve(hashString).resolve(download.getFileName());
+                                    var target = DownloadHelper.getCacheFileName(cfg, serverCfg, hash, download.getFileName());
                                     DownloadHelper.saveTo(target, bytes);
                                     return Pair.of(hash, target);
                                 } catch (IOException e) {
                                     throw new UncheckedIOException("error saving file", e);
                                 }
                             }, Util.BACKGROUND_EXECUTOR)
-                            .thenCompose(data -> ModFileManager.handleDownload(data.left(), data.right(), uploader, serverCfg))
+                            .thenCompose(data -> ModFileManager.handleDownload(data.left(), data.right(), uploader, msg.getId()))
                             .exceptionally(ex -> {
-                                LOGGER.error("Download error on {}", download.getUrl(), ex);
                                 errored.set(true);
-                                msg.addReaction(STATUS_ERROR);
+                                // omit stacktrace for this case
+                                if (ex instanceof FileAlreadyExistsException) {
+                                    LOGGER.error("File already exists: {}", ex.getMessage());
+                                    return null;
+                                }
+
+                                LOGGER.error("Download error on {}", download.getUrl(), ex);
                                 return null;
                             })).toArray(CompletableFuture[]::new))
-                    .thenRun(() -> {
-                        msg.removeReactionByEmoji(STATUS_PROCESSING);
+                    .thenCompose(aVoid -> {
                         if (!errored.get()) {
-                            msg.addReaction(STATUS_SUCCESS);
+                            return msg.addReaction(STATUS_SUCCESS);
+                        } else {
+                            return msg.addReaction(STATUS_ERROR);
                         }
-                    });
+                    }).thenCompose(aVoid -> msg.removeOwnReactionByEmoji(STATUS_PROCESSING));
         }, Util.BACKGROUND_EXECUTOR);
     }
 }

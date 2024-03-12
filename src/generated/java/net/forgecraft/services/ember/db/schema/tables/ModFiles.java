@@ -12,6 +12,7 @@ import java.util.List;
 import net.forgecraft.services.ember.db.schema.DefaultSchema;
 import net.forgecraft.services.ember.db.schema.Indexes;
 import net.forgecraft.services.ember.db.schema.Keys;
+import net.forgecraft.services.ember.db.schema.tables.ApprovalQueue.ApprovalQueuePath;
 import net.forgecraft.services.ember.db.schema.tables.DiscordUsers.DiscordUsersPath;
 import net.forgecraft.services.ember.db.schema.tables.Mods.ModsPath;
 import net.forgecraft.services.ember.db.schema.tables.records.ModFilesRecord;
@@ -83,7 +84,7 @@ public class ModFiles extends TableImpl<ModFilesRecord> {
     /**
      * The column <code>mod_files.active</code>.
      */
-    public final TableField<ModFilesRecord, Boolean> ACTIVE = createField(DSL.name("active"), SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("TRUE"), SQLDataType.BOOLEAN)), this, "");
+    public final TableField<ModFilesRecord, Boolean> ACTIVE = createField(DSL.name("active"), SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("FALSE"), SQLDataType.BOOLEAN)), this, "");
 
     /**
      * The column <code>mod_files.file_name</code>.
@@ -204,6 +205,19 @@ public class ModFiles extends TableImpl<ModFilesRecord> {
             _discordUsers = new DiscordUsersPath(this, Keys.MOD_FILES__FK_MOD_FILES_PK_DISCORD_USERS, null);
 
         return _discordUsers;
+    }
+
+    private transient ApprovalQueuePath _approvalQueue;
+
+    /**
+     * Get the implicit to-many join path to the <code>approval_queue</code>
+     * table
+     */
+    public ApprovalQueuePath approvalQueue() {
+        if (_approvalQueue == null)
+            _approvalQueue = new ApprovalQueuePath(this, null, Keys.APPROVAL_QUEUE__FK_APPROVAL_QUEUE_PK_MOD_FILES.getInverseKey());
+
+        return _approvalQueue;
     }
 
     @Override

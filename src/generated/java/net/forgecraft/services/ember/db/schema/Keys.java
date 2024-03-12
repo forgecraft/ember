@@ -4,11 +4,13 @@
 package net.forgecraft.services.ember.db.schema;
 
 
+import net.forgecraft.services.ember.db.schema.tables.ApprovalQueue;
 import net.forgecraft.services.ember.db.schema.tables.AuditLog;
 import net.forgecraft.services.ember.db.schema.tables.DiscordUsers;
 import net.forgecraft.services.ember.db.schema.tables.ModFiles;
 import net.forgecraft.services.ember.db.schema.tables.ModOwners;
 import net.forgecraft.services.ember.db.schema.tables.Mods;
+import net.forgecraft.services.ember.db.schema.tables.records.ApprovalQueueRecord;
 import net.forgecraft.services.ember.db.schema.tables.records.AuditLogRecord;
 import net.forgecraft.services.ember.db.schema.tables.records.DiscordUsersRecord;
 import net.forgecraft.services.ember.db.schema.tables.records.ModFilesRecord;
@@ -33,6 +35,7 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<ApprovalQueueRecord> APPROVAL_QUEUE__PK_APPROVAL_QUEUE = Internal.createUniqueKey(ApprovalQueue.APPROVAL_QUEUE, DSL.name("pk_approval_queue"), new TableField[] { ApprovalQueue.APPROVAL_QUEUE.MESSAGE_ID }, true);
     public static final UniqueKey<AuditLogRecord> AUDIT_LOG__PK_AUDIT_LOG = Internal.createUniqueKey(AuditLog.AUDIT_LOG, DSL.name("pk_audit_log"), new TableField[] { AuditLog.AUDIT_LOG.ID }, true);
     public static final UniqueKey<DiscordUsersRecord> DISCORD_USERS__PK_DISCORD_USERS = Internal.createUniqueKey(DiscordUsers.DISCORD_USERS, DSL.name("pk_discord_users"), new TableField[] { DiscordUsers.DISCORD_USERS.SNOWFLAKE }, true);
     public static final UniqueKey<ModFilesRecord> MOD_FILES__PK_MOD_FILES = Internal.createUniqueKey(ModFiles.MOD_FILES, DSL.name("pk_mod_files"), new TableField[] { ModFiles.MOD_FILES.ID }, true);
@@ -43,6 +46,7 @@ public class Keys {
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final ForeignKey<ApprovalQueueRecord, ModFilesRecord> APPROVAL_QUEUE__FK_APPROVAL_QUEUE_PK_MOD_FILES = Internal.createForeignKey(ApprovalQueue.APPROVAL_QUEUE, DSL.name("fk_approval_queue_pk_mod_files"), new TableField[] { ApprovalQueue.APPROVAL_QUEUE.MOD_FILE_ID }, Keys.MOD_FILES__PK_MOD_FILES, new TableField[] { ModFiles.MOD_FILES.ID }, true);
     public static final ForeignKey<AuditLogRecord, DiscordUsersRecord> AUDIT_LOG__FK_AUDIT_LOG_PK_DISCORD_USERS = Internal.createForeignKey(AuditLog.AUDIT_LOG, DSL.name("fk_audit_log_pk_discord_users"), new TableField[] { AuditLog.AUDIT_LOG.USER_ID }, Keys.DISCORD_USERS__PK_DISCORD_USERS, new TableField[] { DiscordUsers.DISCORD_USERS.SNOWFLAKE }, true);
     public static final ForeignKey<ModFilesRecord, DiscordUsersRecord> MOD_FILES__FK_MOD_FILES_PK_DISCORD_USERS = Internal.createForeignKey(ModFiles.MOD_FILES, DSL.name("fk_mod_files_pk_discord_users"), new TableField[] { ModFiles.MOD_FILES.UPLOADER_ID }, Keys.DISCORD_USERS__PK_DISCORD_USERS, new TableField[] { DiscordUsers.DISCORD_USERS.SNOWFLAKE }, true);
     public static final ForeignKey<ModFilesRecord, ModsRecord> MOD_FILES__FK_MOD_FILES_PK_MODS = Internal.createForeignKey(ModFiles.MOD_FILES, DSL.name("fk_mod_files_pk_mods"), new TableField[] { ModFiles.MOD_FILES.MOD_ID }, Keys.MODS__PK_MODS, new TableField[] { Mods.MODS.ID }, true);

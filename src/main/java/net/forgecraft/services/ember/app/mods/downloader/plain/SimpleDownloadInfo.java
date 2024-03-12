@@ -43,7 +43,7 @@ public class SimpleDownloadInfo implements DownloadInfo {
                         throw new IllegalStateException("Failed to download " + url + ": Received status code " + response.statusCode());
                     }
                     var bytes = response.body();
-                    var calculatedHash = Hash.fromBytes(Hash.Type.SHA512, bytes);
+                    var calculatedHash = Hash.of(Hash.Type.SHA512, bytes);
 
                     // verify hash matches if it exists
                     if (hashSha512 != null) {

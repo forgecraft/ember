@@ -30,8 +30,12 @@ public record Hash(Type type, HashCode value) {
         return new Hash(type, HashCode.fromString(hash));
     }
 
+    public static Hash fromBytes(Type type, byte[] value) {
+        return new Hash(type, HashCode.fromBytes(value));
+    }
+
     @SuppressWarnings("deprecation")
-    public static Hash fromBytes(Type type, byte[] data) {
+    public static Hash of(Type type, byte[] data) {
         HashFunction function = switch (type) {
             case SHA512 -> Hashing.sha512();
             case SHA256 -> Hashing.sha256();

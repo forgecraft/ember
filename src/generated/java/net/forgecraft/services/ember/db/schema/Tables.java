@@ -4,6 +4,7 @@
 package net.forgecraft.services.ember.db.schema;
 
 
+import net.forgecraft.services.ember.db.schema.tables.ApprovalQueue;
 import net.forgecraft.services.ember.db.schema.tables.AuditLog;
 import net.forgecraft.services.ember.db.schema.tables.DiscordUsers;
 import net.forgecraft.services.ember.db.schema.tables.ModFiles;
@@ -16,6 +17,11 @@ import net.forgecraft.services.ember.db.schema.tables.Mods;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
+
+    /**
+     * The table <code>approval_queue</code>.
+     */
+    public static final ApprovalQueue APPROVAL_QUEUE = ApprovalQueue.APPROVAL_QUEUE;
 
     /**
      * The table <code>audit_log</code>.
