@@ -5,7 +5,7 @@ import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.Downloader;
 import net.forgecraft.services.ember.app.mods.downloader.Hash;
 import net.forgecraft.services.ember.app.mods.downloader.modrinth.api.ModrinthVersionResponse;
-import net.forgecraft.services.ember.util.serialization.JsonBodyHandlerApache;
+import net.forgecraft.services.ember.util.serialization.JsonResponseHandler;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -88,7 +88,7 @@ public class ModrinthDownloader implements Downloader {
         var request = addAuthHeader(new HttpGet(uri), cfg);
 
         try {
-            var modrinthVersion = client.execute(request, JsonBodyHandlerApache.of(ModrinthVersionResponse.class));
+            var modrinthVersion = client.execute(request, JsonResponseHandler.of(ModrinthVersionResponse.class));
             if (modrinthVersion == null) {
                 LOGGER.error("Received empty response for {}", request.getRequestUri());
                 return null;

@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.Hash;
 import net.forgecraft.services.ember.util.Util;
-import net.forgecraft.services.ember.util.serialization.ByteArrayBodyHandlerApache;
+import net.forgecraft.services.ember.util.serialization.ByteArrayResponseHandler;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -42,7 +42,7 @@ public class SimpleDownloadInfo implements DownloadInfo {
         return CompletableFuture.runAsync(this::printStartMessage, Util.BACKGROUND_EXECUTOR)
                 .thenApplyAsync(aVoid -> {
                     try {
-                        return client.execute(createRequest(), ByteArrayBodyHandlerApache.INSTANCE);
+                        return client.execute(createRequest(), ByteArrayResponseHandler.INSTANCE);
                     }
                     catch (IOException e) {
                         throw new UncheckedIOException(e);

@@ -74,6 +74,13 @@ tasks.named("shadowJar", Jar::class).configure {
 
 tasks.named("jar", Jar::class).configure {
     archiveClassifier.set("slim")
+
+    manifest.attributes(
+        "Specification-Vendor" to "ForgeCraft (https://forgecraft.net)",
+        "Implementation-Vendor" to "https://github.com/forgecraft/Ember",
+        "Implementation-Title" to "Ember",
+        "Implementation-Version" to project.version.toString(),
+    )
 }
 
 tasks.withType(JavaCompile::class).configureEach {

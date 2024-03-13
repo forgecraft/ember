@@ -5,7 +5,7 @@ import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.Downloader;
 import net.forgecraft.services.ember.app.mods.downloader.Hash;
 import net.forgecraft.services.ember.util.Util;
-import net.forgecraft.services.ember.util.serialization.StatusCodeOnlyBodyHandlerApache;
+import net.forgecraft.services.ember.util.serialization.StatusCodeOnlyResponseHandler;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpHead;
@@ -84,7 +84,7 @@ public class MavenDownloader implements Downloader {
         LOGGER.trace("Checking {}", request.getRequestUri());
 
         try {
-            var responseStatus = client.execute(request, StatusCodeOnlyBodyHandlerApache.INSTANCE);
+            var responseStatus = client.execute(request, StatusCodeOnlyResponseHandler.INSTANCE);
             if (responseStatus == HttpStatus.SC_OK) {
                 LOGGER.debug("Found artifact {} at {}", artifact, maven);
                 return true;

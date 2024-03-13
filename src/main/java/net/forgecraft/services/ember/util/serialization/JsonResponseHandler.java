@@ -8,12 +8,12 @@ import org.apache.hc.core5.http.HttpEntity;
 
 import java.io.IOException;
 
-public class JsonBodyHandlerApache<T> extends AbstractHttpClientResponseHandler<T> {
+public class JsonResponseHandler<T> extends AbstractHttpClientResponseHandler<T> {
 
     private final Class<T> type;
     private final ObjectMapper mapper;
 
-    private JsonBodyHandlerApache(Class<T> type, ObjectMapper mapper) {
+    private JsonResponseHandler(Class<T> type, ObjectMapper mapper) {
         this.type = type;
         this.mapper = mapper;
     }
@@ -27,11 +27,11 @@ public class JsonBodyHandlerApache<T> extends AbstractHttpClientResponseHandler<
         }
     }
 
-    public static <T> JsonBodyHandlerApache<T> of(Class<T> type, ObjectMapper mapper) {
-        return new JsonBodyHandlerApache<>(type, mapper);
+    public static <T> JsonResponseHandler<T> of(Class<T> type, ObjectMapper mapper) {
+        return new JsonResponseHandler<>(type, mapper);
     }
 
-    public static <T> JsonBodyHandlerApache<T> of(Class<T> type) {
+    public static <T> JsonResponseHandler<T> of(Class<T> type) {
         return of(type, JsonMapper.builder()
                 .findAndAddModules()
                 .enable(SerializationFeature.INDENT_OUTPUT)

@@ -44,6 +44,7 @@ public class Util {
     public static CloseableHttpClient newHttpClient() {
         return HttpClients.custom()
                 .setRedirectStrategy(DefaultRedirectStrategy.INSTANCE)
+                .setUserAgent(ProjectInfo.INSTANCE.asUserAgentString())
                 .build();
     }
 

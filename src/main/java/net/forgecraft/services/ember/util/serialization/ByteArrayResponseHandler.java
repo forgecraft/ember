@@ -5,11 +5,11 @@ import org.apache.hc.core5.http.HttpEntity;
 
 import java.io.IOException;
 
-public class ByteArrayBodyHandlerApache extends AbstractHttpClientResponseHandler<byte[]> {
+public class ByteArrayResponseHandler extends AbstractHttpClientResponseHandler<byte[]> {
 
-    public static final ByteArrayBodyHandlerApache INSTANCE = new ByteArrayBodyHandlerApache();
+    public static final ByteArrayResponseHandler INSTANCE = new ByteArrayResponseHandler();
 
-    private ByteArrayBodyHandlerApache() {
+    private ByteArrayResponseHandler() {
     }
 
     @Override
