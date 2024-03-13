@@ -5,7 +5,10 @@ import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.Downloader;
 import net.forgecraft.services.ember.app.mods.downloader.Hash;
 import net.forgecraft.services.ember.app.mods.downloader.modrinth.api.ModrinthVersionResponse;
-import net.forgecraft.services.ember.util.serialization.JsonBodyHandler;
+import net.forgecraft.services.ember.util.serialization.JsonBodyHandlerApache;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -35,9 +36,9 @@ public class ModrinthDownloader implements Downloader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ModrinthDownloader.class);
 
     private final ModrinthConfig cfg;
-    private final Supplier<HttpClient> clientFactory;
+    private final Supplier<CloseableHttpClient> clientFactory;
 
-    public ModrinthDownloader(ModrinthConfig cfg, Supplier<HttpClient> clientFactory) {
+    public ModrinthDownloader(ModrinthConfig cfg, Supplier<CloseableHttpClient> clientFactory) {
         this.cfg = cfg;
         this.clientFactory = clientFactory;
     }
@@ -75,26 +76,21 @@ public class ModrinthDownloader implements Downloader {
             return null;
         }
 
-        HttpRequest.Builder builder = addAuthHeader(HttpRequest.newBuilder(), cfg);
+        URI uri;
+
         if (project != null) {
             // https://docs.modrinth.com/#tag/versions/operation/getVersionFromIdOrNumber
-            builder.uri(URI.create("%s/project/%s/version/%s".formatted(API_URL, project, version)));
+            uri = URI.create("%s/project/%s/version/%s".formatted(API_URL, project, version));
         } else {
             // https://docs.modrinth.com/#tag/versions/operation/getVersion
-            builder.uri(URI.create("%s/version/%s".formatted(API_URL, version)));
+            uri = URI.create("%s/version/%s".formatted(API_URL, version));
         }
-        var request = builder.build();
+        var request = addAuthHeader(new HttpGet(uri), cfg);
 
         try {
-            var response = client.send(request, JsonBodyHandler.of(ModrinthVersionResponse.class));
-            if (response.statusCode() != 200) {
-                LOGGER.error("Failed to send request to modrinth: Received HTTP Status {} for {}", response.statusCode(), request.uri());
-                return null;
-            }
-
-            var modrinthVersion = response.body();
+            var modrinthVersion = client.execute(request, JsonBodyHandlerApache.of(ModrinthVersionResponse.class));
             if (modrinthVersion == null) {
-                LOGGER.error("Received empty response for {}", request.uri());
+                LOGGER.error("Received empty response for {}", request.getRequestUri());
                 return null;
             }
 
@@ -113,15 +109,15 @@ public class ModrinthDownloader implements Downloader {
 
             return new ModrinthDownloadInfo(primaryFile.url(), primaryFile.filename(), hash, client, cfg);
 
-        } catch (UncheckedIOException | IOException | InterruptedException e) {
-            LOGGER.error("Failed to look up modrinth version {} at {}", version, request.uri(), e);
+        } catch (UncheckedIOException | IOException e) {
+            LOGGER.error("Failed to look up modrinth version {} at {}", version, request.getRequestUri(), e);
         }
 
         return null;
     }
 
-    static HttpRequest.Builder addAuthHeader(HttpRequest.Builder builder, ModrinthConfig cfg) {
-        cfg.accessToken().ifPresent(token -> builder.header("Authorization", token));
-        return builder;
+    static <T extends HttpUriRequestBase> T addAuthHeader(T request, ModrinthConfig cfg) {
+        cfg.accessToken().ifPresent(token -> request.addHeader("Authorization", token));
+        return request;
     }
 }

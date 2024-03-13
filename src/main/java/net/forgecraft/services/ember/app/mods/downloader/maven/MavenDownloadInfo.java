@@ -2,12 +2,12 @@ package net.forgecraft.services.ember.app.mods.downloader.maven;
 
 import net.forgecraft.services.ember.app.mods.downloader.Hash;
 import net.forgecraft.services.ember.app.mods.downloader.plain.SimpleDownloadInfo;
+import org.apache.hc.client5.http.classic.HttpClient;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.net.http.HttpClient;
 
 class MavenDownloadInfo extends SimpleDownloadInfo {
 

@@ -3,11 +3,11 @@ package net.forgecraft.services.ember.app.mods.downloader.modrinth;
 import net.forgecraft.services.ember.app.config.ModrinthConfig;
 import net.forgecraft.services.ember.app.mods.downloader.Hash;
 import net.forgecraft.services.ember.app.mods.downloader.plain.SimpleDownloadInfo;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 
 public class ModrinthDownloadInfo extends SimpleDownloadInfo {
 
@@ -19,7 +19,7 @@ public class ModrinthDownloadInfo extends SimpleDownloadInfo {
     }
 
     @Override
-    protected HttpRequest.Builder createRequestBuilder() {
-        return ModrinthDownloader.addAuthHeader(super.createRequestBuilder(), cfg);
+    protected HttpUriRequestBase createRequest() {
+        return ModrinthDownloader.addAuthHeader(super.createRequest(), cfg);
     }
 }

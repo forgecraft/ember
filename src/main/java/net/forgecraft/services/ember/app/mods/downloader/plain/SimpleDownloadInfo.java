@@ -4,14 +4,17 @@ import com.google.common.base.Preconditions;
 import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.Hash;
 import net.forgecraft.services.ember.util.Util;
+import net.forgecraft.services.ember.util.serialization.ByteArrayBodyHandlerApache;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.concurrent.CompletableFuture;
 
 public class SimpleDownloadInfo implements DownloadInfo {
@@ -37,12 +40,15 @@ public class SimpleDownloadInfo implements DownloadInfo {
 
     protected CompletableFuture<byte[]> startDownload() {
         return CompletableFuture.runAsync(this::printStartMessage, Util.BACKGROUND_EXECUTOR)
-                .thenComposeAsync(aVoid -> client.sendAsync(createRequestBuilder().build(), HttpResponse.BodyHandlers.ofByteArray()))
-                .thenApply(response -> {
-                    if (response.statusCode() != 200) {
-                        throw new IllegalStateException("Failed to download " + url + ": Received status code " + response.statusCode());
+                .thenApplyAsync(aVoid -> {
+                    try {
+                        return client.execute(createRequest(), ByteArrayBodyHandlerApache.INSTANCE);
                     }
-                    var bytes = response.body();
+                    catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                })
+                .thenApply(bytes -> {
                     var calculatedHash = Hash.of(Hash.Type.SHA512, bytes);
 
                     // verify hash matches if it exists
@@ -61,8 +67,8 @@ public class SimpleDownloadInfo implements DownloadInfo {
         LOGGER.debug("Downloading {}", url);
     }
 
-    protected HttpRequest.Builder createRequestBuilder() {
-        return HttpRequest.newBuilder(url);
+    protected HttpUriRequestBase createRequest() {
+        return new HttpGet(url);
     }
 
     @Override

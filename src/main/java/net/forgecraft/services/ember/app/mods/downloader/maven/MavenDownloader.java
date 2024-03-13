@@ -5,20 +5,22 @@ import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.Downloader;
 import net.forgecraft.services.ember.app.mods.downloader.Hash;
 import net.forgecraft.services.ember.util.Util;
+import net.forgecraft.services.ember.util.serialization.StatusCodeOnlyBodyHandlerApache;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Resolves a maven artifact classifier (maven:group:artifact:version:classifier@extension) to a path, then queries each
@@ -76,19 +78,18 @@ public class MavenDownloader implements Downloader {
     }
 
     private static boolean checkArtifactExists(String maven, ArtifactInfo artifact, HttpClient client) {
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create(maven + "/" + artifact.toUrlPath()))
-                .HEAD()
-                .build();
-        LOGGER.trace("Checking {}", request.uri());
+
+        var request = new HttpHead(URI.create(maven + "/" + artifact.toUrlPath()));
+
+        LOGGER.trace("Checking {}", request.getRequestUri());
 
         try {
-            var response = client.send(request, HttpResponse.BodyHandlers.discarding());
-            if (response.statusCode() == 200) {
+            var responseStatus = client.execute(request, StatusCodeOnlyBodyHandlerApache.INSTANCE);
+            if (responseStatus == HttpStatus.SC_OK) {
                 LOGGER.debug("Found artifact {} at {}", artifact, maven);
                 return true;
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             LOGGER.error("Failed to look up artifact {} in maven {}", artifact, maven, e);
         }
 
@@ -120,17 +121,11 @@ public class MavenDownloader implements Downloader {
         try {
             var url = URI.create(mavenUrl + "/" + artifact.toHashFilePath(hashType));
             LOGGER.trace("Trying to download hash file {}", url);
-            var request = HttpRequest.newBuilder()
-                    .uri(url)
-                    .GET()
-                    .build();
-            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                var rawHash = response.body().lines().collect(Collectors.joining()).strip();
-                LOGGER.trace("Hash for {} is {}", artifact, rawHash);
-                return Hash.fromString(hashType, rawHash);
-            }
-        } catch (Exception e) {
+            var request = new HttpGet(url);
+            var rawHash = client.execute(request, new BasicHttpClientResponseHandler()).strip();
+            LOGGER.trace("Hash for {} is {}", artifact, rawHash);
+            return Hash.fromString(hashType, rawHash);
+        } catch (IOException e) {
             // ignore exception, we'll just download the file without the hash
             LOGGER.debug("Failed to download {} hash for {}", hashType, artifact, e);
         }

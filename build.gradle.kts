@@ -55,6 +55,8 @@ dependencies {
     implementation("it.unimi.dsi:fastutil:8.5.13")
     implementation("com.electronwill.night-config:toml:3.6.7")
 
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
+
     implementation("info.picocli:picocli:4.7.5")
     annotationProcessor("info.picocli:picocli-codegen:4.7.5")
 

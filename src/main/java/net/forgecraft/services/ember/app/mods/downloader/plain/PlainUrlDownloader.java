@@ -2,13 +2,13 @@ package net.forgecraft.services.ember.app.mods.downloader.plain;
 
 import net.forgecraft.services.ember.app.mods.downloader.DownloadInfo;
 import net.forgecraft.services.ember.app.mods.downloader.Downloader;
+import org.apache.hc.client5.http.classic.HttpClient;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
 import java.util.function.Supplier;
 
 public class PlainUrlDownloader implements Downloader {

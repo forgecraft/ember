@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import net.forgecraft.services.ember.Main;
 import net.forgecraft.services.ember.app.Services;
+import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 
-import java.net.http.HttpClient;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,15 +41,9 @@ public class Util {
 
     //TODO might be wise to use a different http library that allows setting default headers such as User-Agent
 
-    /**
-     * @return a new {@link HttpClient} that follows redirects
-     * @implNote Need to use the builder because the default HTTP client does not follow any redirects.
-     * We change this so it does, except for redirects to less secure URLs, i.e. https to http
-     */
-    public static HttpClient newHttpClient() {
-        return HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.NORMAL)
-                .executor(Util.BACKGROUND_EXECUTOR)
+    public static CloseableHttpClient newHttpClient() {
+        return HttpClients.custom()
+                .setRedirectStrategy(DefaultRedirectStrategy.INSTANCE)
                 .build();
     }
 
