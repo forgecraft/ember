@@ -54,6 +54,7 @@ dependencies {
     implementation("com.google.guava:guava:33.0.0-jre")
     implementation("it.unimi.dsi:fastutil:8.5.13")
     implementation("com.electronwill.night-config:toml:3.6.7")
+    implementation("io.github.matyrobbrt:curseforgeapi:1.8.0")
 
     implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
 

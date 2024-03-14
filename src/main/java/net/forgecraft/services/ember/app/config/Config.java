@@ -12,6 +12,7 @@ public class Config {
 
     private final GeneralConfig general = GeneralConfig.create();
     private final DiscordConfig discord = DiscordConfig.create();
+    private final CurseforgeConfig curseforge = CurseforgeConfig.create();
     private final ModrinthConfig modrinth = ModrinthConfig.create();
     private final List<MinecraftServerConfig> minecraftServers = List.of(MinecraftServerConfig.create());
 
@@ -52,6 +53,10 @@ public class Config {
 
     public DiscordConfig getDiscord() {
         return discord;
+    }
+
+    public CurseforgeConfig getCurseforge() {
+        return curseforge;
     }
 
     public ModrinthConfig getModrinth() {

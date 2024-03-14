@@ -61,8 +61,6 @@ public class ModrinthDownloader implements Downloader {
         if (matcher.matches()) {
             project = matcher.group("project");
             version = matcher.group("version");
-
-
         } else {
             matcher = MODRINTH_URL_PATTERN.matcher(inputData);
             if (matcher.matches()) {
@@ -72,7 +70,7 @@ public class ModrinthDownloader implements Downloader {
         }
 
         if (version == null) {
-            LOGGER.error("Failed to parse modrinth version from {}", inputData);
+            LOGGER.error("Failed to parse Modrinth version from {}", inputData);
             return null;
         }
 

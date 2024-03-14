@@ -24,7 +24,7 @@ public enum DownloaderFactory {
      */
     private final Supplier<List<Downloader>> downloaders = Suppliers.memoize(() -> List.of(
             new ModrinthDownloader(Util.services().getConfig().getModrinth(), Util::newHttpClient),
-            new CurseForgeDownloader(),
+            new CurseForgeDownloader(Util.services().getConfig().getCurseforge(), Util::newHttpClient),
             new MavenDownloader(Util::newHttpClient, Util.KNOWN_MAVENS),
             new PlainUrlDownloader(Util::newHttpClient, Util.OPT_ALLOW_INSECURE_DOWNLOADS)
     ));
