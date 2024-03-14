@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 public class ModrinthDownloader implements Downloader {
 
     private static final String API_URL = "https://api.modrinth.com/v2";
-    private static final Pattern MODRINTH_ID_PATTERN = Pattern.compile("modrinth:((?<project>\\w+):)?(?<version>\\w+)");
+    private static final Pattern MODRINTH_ID_PATTERN = Pattern.compile("(?:modrinth|mr):(?:(?<project>\\w+):)?(?<version>\\w+)");
     private static final Pattern MODRINTH_URL_PATTERN = Pattern.compile("https://(www\\.)?modrinth\\.com/mod/(?<project>.+)/version/(?<version>.+)");
     private static final Logger LOGGER = LoggerFactory.getLogger(ModrinthDownloader.class);
 

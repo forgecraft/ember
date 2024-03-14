@@ -37,7 +37,7 @@ public class CurseForgeDownloader implements Downloader {
 
     public static final String CURSEFORGE_API_KEY_HEADER = "X-Api-Key";
 
-    private static final Pattern CURSEFORGE_ID_PATTERN = Pattern.compile("curseforge:((?<slug>\\w+):)?(?<fileID>\\w+)");
+    private static final Pattern CURSEFORGE_ID_PATTERN = Pattern.compile("(?:curseforge|cf):(?:(?<slug>\\w+):)?(?<fileID>\\d+)");
     private static final Pattern CURSEFORGE_URL_PATTERN = Pattern.compile("https://(?:legacy|www)\\.curseforge\\.com/minecraft/mc-mods/(?<slug>.+)/(?:files|download)/(?<fileID>\\d+)");
     private static final Logger LOGGER = LoggerFactory.getLogger(CurseForgeDownloader.class);
 
