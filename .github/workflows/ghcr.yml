@@ -2,8 +2,6 @@ name: Upload to GHCR
 
 on:
   push:
-    paths-ignore:
-      - '.github/**'
     branches:
       - '*'
     tags:
@@ -11,9 +9,8 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        java-version: [ 21 ]
+    env:
+      JAVA_VERSION: 21
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +18,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
-          java-version: ${{ matrix.java-version }}
+          java-version: ${{ env.JAVA_VERSION }}
           cache: 'gradle'
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -56,5 +53,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            JAVA_VERSON=${{ matrix.java-version }}
+            JAVA_VERSON=${{ env.JAVA_VERSON }}
             VERSION=${{ github.ref_name }}

@@ -2,19 +2,12 @@ name: Build Status
 
 on:
   push:
-    paths-ignore:
-      - '.github/**'
-    branches:
-      - '*'
-    pull_request:
-      branches:
-        - '*'
+  pull_request:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        java-version: [21]
+    env:
+      JAVA_VERSION: 21
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +15,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
-          java-version: ${{ matrix.java-version }}
+          java-version: ${{ env.JAVA_VERSION }}
           cache: 'gradle'
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
