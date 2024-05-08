@@ -39,8 +39,6 @@ public class Util {
             "https://maven.uuid.gg/releases"
     );
 
-    //TODO might be wise to use a different http library that allows setting default headers such as User-Agent
-
     public static CloseableHttpClient newHttpClient() {
         return HttpClients.custom()
                 .setRedirectStrategy(DefaultRedirectStrategy.INSTANCE)
