@@ -53,5 +53,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            JAVA_VERSON=${{ env.JAVA_VERSON }}
+            JAVA_VERSION=${{ env.JAVA_VERSION }}
             VERSION=${{ github.ref_name }}
