@@ -1,4 +1,4 @@
-# Ember
+# Ember [![Build Status](https://github.com/forgecraft/Ember/actions/workflows/build_status.yml/badge.svg)](https://github.com/forgecraft/Ember/actions/workflows/build_status.yml)
 
 Ember is our resident ForgeCraft Discord bot. It's a relatively simple bot that just helps with the day to day running of the server. It's written in Java and JavaCord.
 
@@ -19,4 +19,4 @@ If you would like to contribute to Ember, please feel free to fork the repositor
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE file](LICENSE.md) for details.

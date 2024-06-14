@@ -1,7 +1,7 @@
 package net.forgecraft.services.ember.mods.downloader;
 
 import net.forgecraft.services.ember.app.mods.downloader.DownloaderFactory;
-import net.forgecraft.services.ember.app.mods.downloader.MavenDownloader;
+import net.forgecraft.services.ember.app.mods.downloader.maven.MavenDownloader;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class MavenDownloaderTest {
 
             assertInstanceOf(MavenDownloader.class, downloader);
 
-            var download = downloader.download(joinedInputData);
+            var download = downloader.createDownloadInstance(joinedInputData);
             assertNotNull(download);
         }
     }

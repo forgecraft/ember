@@ -1,36 +1,64 @@
 package net.forgecraft.services.ember.mods.downloader;
 
-import net.forgecraft.services.ember.app.mods.ModInfoParser;
+import com.google.common.collect.ImmutableMap;
+import net.forgecraft.services.ember.app.mods.parser.ModInfoParser;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.net.http.HttpClient;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ModInfoParserTest {
+
+    @BeforeAll
+    public static void setup() throws Exception {
+
+        Files.createDirectories(Path.of("downloads"));
+
+        var files = ImmutableMap.<String, String>builder()
+                .put("https://maven.blamejared.com/mezz/jei/jei-1.19.2-forge/11.2.0.246/jei-1.19.2-forge-11.2.0.246.jar", "downloads/jei-1.19.2-forge-11.2.0.246.jar")
+                .put("https://maven.blamejared.com/mezz/jei/jei-1.19.2-fabric/11.2.0.246/jei-1.19.2-fabric-11.2.0.246.jar", "downloads/jei-1.19.2-fabric-11.2.0.246.jar")
+                .build();
+
+        try (var client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build()) {
+            files.forEach((url, path) -> {
+                var request = java.net.http.HttpRequest.newBuilder().uri(java.net.URI.create(url)).build();
+                try {
+                    client.send(request, java.net.http.HttpResponse.BodyHandlers.ofFile(Path.of(path)));
+                } catch (IOException | InterruptedException e) {
+                    throw new IllegalStateException("Failed to download file", e);
+                }
+            });
+        }
+    }
+
     @Test
     void canParseValidForgeMod() {
-        // TODO: Fix this location to something non-absolute
-        var pathToMod = Path.of("./downloads/jei-1.19.1-forge-11.2.0.244.jar");
-        var parser = new ModInfoParser(pathToMod);
+        var pathToMod = Path.of("downloads/jei-1.19.2-forge-11.2.0.246.jar");
+        var info = assertDoesNotThrow(() -> ModInfoParser.parse(pathToMod));
 
-        var info = assertDoesNotThrow(parser::parse);
+        assertFalse(info.isEmpty(), "No mod info found");
+        var first = info.getFirst();
 
-        // Not all mods will have the same values for both forge and fabric!
-        assertEquals("jei", info.id());
-        assertEquals("Just Enough Items", info.name());
-        assertEquals("11.2.0.244", info.version());
+        assertEquals("jei", first.id());
+        assertEquals("Just Enough Items", first.name());
+        assertEquals("11.2.0.246", first.version());
     }
 
     @Test
     void canParseValidFabricMod() {
-        // TODO: Fix this location to something non-absolute
-        var pathToMod = Path.of("./downloads/jei-1.19.1-fabric-11.2.0.244.jar");
-        var parser = new ModInfoParser(pathToMod);
+        var pathToMod = Path.of("downloads/jei-1.19.2-fabric-11.2.0.246.jar");
+        var info = assertDoesNotThrow(() -> ModInfoParser.parse(pathToMod));
 
-        var info = assertDoesNotThrow(parser::parse);
-        assertEquals("jei", info.id());
-        assertEquals("Just Enough Items", info.name());
-        assertEquals("11.2.0.244", info.version());
+        assertFalse(info.isEmpty(), "No mod info found");
+        var first = info.getFirst();
+
+        assertEquals("jei", first.id());
+        assertEquals("Just Enough Items", first.name());
+        assertEquals("11.2.0.246", first.version());
     }
 }
