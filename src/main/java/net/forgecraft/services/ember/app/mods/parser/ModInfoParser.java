@@ -43,7 +43,13 @@ public class ModInfoParser {
                 try (var reader = Files.newBufferedReader(modsToml)) {
                     return parseModsToml(reader);
                 }
-
+            }
+            // NeoForge: neoforge.mods.toml
+            modsToml = system.getPath("META-INF/neoforge.mods.toml");
+            if (Files.exists(modsToml)) {
+                try (var reader = Files.newBufferedReader(modsToml)) {
+                    return parseModsToml(reader);
+                }
             }
 
             var quiltModJson = system.getPath("quilt.mod.json");
@@ -78,7 +84,7 @@ public class ModInfoParser {
         List<CommentedConfig> mods = cfgRoot.get("mods");
         if (mods != null) {
             for (CommentedConfig mod : mods) {
-                String modId = mod.get("modId"); // only mandatory field
+                String modId = mod.get("modId"); // on older versions, this is the only mandatory field
                 Preconditions.checkNotNull(modId, "Mod id is missing");
                 Preconditions.checkState(modId.matches("^[a-z][a-z0-9_]{1,63}$"), "Invalid mod id " + modId);
 
